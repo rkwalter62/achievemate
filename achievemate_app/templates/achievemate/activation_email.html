@@ -1,0 +1,10 @@
+{% load static %}
+{% autoescape off %}
+Hi {{ user.username }},
+
+Please click the link below to activate your account:
+{{ domain }}{% url 'activate_account' uidb64=uid token=token %}
+
+Thanks,
+The AchieveMate Team
+{% endautoescape %}

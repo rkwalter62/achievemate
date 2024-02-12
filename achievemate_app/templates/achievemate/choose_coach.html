@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AchieveMate</title>
+    <!-- bootstrap css -->
+    <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/shortcode.css' %}">
+    <!-- owl.carousel -->
+    <link rel="stylesheet" href="{% static 'assets/css/owl.carousel.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/responsive.css' %}">
+    <!-- remixicon css -->
+    <link rel="stylesheet" href="{% static 'assets/css/remixicon.css' %}">
+</head>
+
+<body>
+    <!-- main-page Start  -->
+    <div class="main-page">
+        <!-- header Start -->
+        <header class="header">
+            <!-- topbar -->
+            <div class="topbar">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12">
+                            <!-- topbar-content -->
+                            <div class="topbar-content">
+                                <!-- mail-wrap  -->
+                                <div class="mail-wrap">
+                                    <a href="mailto:help@achieveMate.com" class="text-white"><i
+                                            class="ri-mail-check-fill me-1"></i>help@achieveMate.com</a>
+                                </div>
+                                <!-- logo -->
+                                <div class="navbar-brand">
+                                    <a class="logo" href="{% url 'index' %}"><img src="{% static 'assets/img/logo.svg' %}" alt="logo" /></a>
+                                </div>
+                                <!-- auth-btn-group -->
+                                <!-- user-login-wrap Start-->
+                                <div class="auth-btn-group user-login-wrap">
+                                    <ul>
+                                        <li>
+                                            <!-- User -->
+                                            <span class="header-user">
+                                                <div class="user-img">
+                                                    <img src="{% static 'assets/img/user.png' %}" alt="img/user" />
+                                                </div>
+                                                <span class="user-name">{% if user.is_authenticated %}{{user.username}}{% endif %}</span>
+                                            </span>
+                                        </li>
+                                        <li class="header-logout-btn">
+                                            <!-- Logout -->
+                                            <a href="{% url 'logout' %}" class="btn">
+                                                <span class="auth-icon"><i class="ri-logout-box-r-line"></i></span>
+                                                {% if user.is_authenticated %}
+                                                <span class="auth-text"> Logout</span>
+                                                {% endif %}
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <!-- user-login-wrap END-->
+                                <!-- auth-btn-group -->
+
+                                <!-- add d-none and d-block class for hide show -->
+                                <!-- user-without-login-wrap Start-->
+                                <div class="auth-btn-group user-without-login d-none">
+                                    <ul>
+                                        <li>
+                                            <a href="#" class="btn" data-bs-toggle="modal" data-bs-target="#UserLogin">
+                                                <span class="auth-icon"><i class="ri-login-circle-line"></i></span>
+                                                <span class="auth-text"> Login</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="btn btn-mcolor" data-bs-toggle="modal"
+                                                data-bs-target="#UserSignUp">
+                                                <span class="auth-icon"><i class="ri-user-add-line"></i></span>
+                                                <span class="auth-text">Sign Up</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup"
+                                        aria-expanded="false" aria-label="Toggle navigation">
+                                        <i class="ri-menu-2-line"></i>
+                                    </button>
+                                </div>
+                                <!-- user-without-login-wrap END-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <!-- header END -->
+
+        <!-- full-height-section  Start-->
+        <section class="full-height-section">
+            <!-- pattern-one -->
+            <img src="{% static 'assets/img/pattern-one.svg' %}" class="section-shape bottom-left" alt="img/pattern-one">
+            <!-- pattern-two  -->
+            <img src="{% static 'assets/img/pattern-two.svg' %}" class="section-shape top-right" alt="img/pattern-two">
+            <div class="container">
+                <div class="row align-items-center mb-5">
+                    <div class="col-12">
+                        <div class="choose-coach-head text-center">
+                            <h4 class="title">Choose the coach type</h4>
+                            <p class="desc">To start your project we need to customize your preferences. </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-10 col-lg-8 col-xl-6 m-auto">
+                        <div class="row g-4 g-xl-5">
+                            <div class="col-md-6">
+                                <div class="coach-action-box">
+                                    <h5 class="title">I know the coach</h5>
+                                    <a href="{% url 'coach' %}" class="btn btn-mcolor rounded-pill">Select coach</a>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="coach-action-box">
+                                    <h5 class="title">I am exploring help me to find coach</h5>
+                                    <a href="{% url 'find_coach' %}" class="btn btn-mcolor rounded-pill">begin exploration</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- full-height-section END  -->
+
+    </div>
+    <!-- main-page END  -->
+    
+</body>
+<!-- script -->
+<script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'assets/js/jquery.min.js' %}"></script>
+<!-- owl.carousel -->
+<script src="{% static 'assets/js/owl.carousel.min.js' %}"></script>
+<script src="{% static 'assets/js/script.js' %}"></script>
+<script>
+    $(document).ready(function() {
+        // Listen for the popstate event (triggered by the back button)
+        $(window).on('popstate', function() {
+            // Reload the page
+            location.reload();
+        });
+    });
+</script>
+</html>

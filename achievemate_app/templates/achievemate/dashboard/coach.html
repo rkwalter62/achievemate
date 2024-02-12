@@ -1,0 +1,494 @@
+{% extends "achievemate/dashboard/dashboard_base.html" %}
+{% load static %}
+{% block content %}
+    <!-- page-layout Start -->
+    <section class="page-layout">
+        <!-- mobile_view_header Start-->
+        <header class="header mobile_view_header">
+            <div class="container-fluid">
+                <div class="nav-main">
+                    <div class="logo-wrapper">
+                        <div class="navbar-brand">
+                            <a class="" href="#">
+                                <img src="{% static 'assets/img/logo.svg' %}" alt="logo">
+                            </a>
+                        </div>
+                    </div>
+                    <!-- minimize_toggle -->
+                    <div class="header-wrapper">
+                        <span class="minimize_toggle">
+                            <i class="ri-arrow-right-s-line"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <!-- mobile_view_header END-->
+
+         <!-- page-topbar Start -->
+         <div class="page-topbar">
+            <div class="conteiner-fluid">
+                <div class="row align-items-center">
+                    <div class="col-12">
+                        <!-- breadcrumb -->
+                        <div class="breadcrumb-wrap">
+                            <nav aria-label="breadcrumb">
+                                <ul class="breadcrumb">
+                                    <li class="breadcrumb-item">Pages</li>
+                                    <li class="breadcrumb-item" aria-current="page">Select Coach</li>
+                                </ul>
+                            </nav>
+                            <!-- page-title -->
+                            <div class="page-title">
+                                <h2>Select Coach</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- page-topbar END -->
+
+        <!-- main-content start  -->
+        <div class="main-content">
+            <div class="row">
+                <div class="col-12">
+                    <!-- section-title -->
+                    <div class="section-title">
+                        <h4>Recommended coach for you</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <!-- select-coach-section -->
+                    <div class="select-coach-section">
+                        <div class="row g-4">
+                            <div class="col-lg-4 col-xl-3 col-xxl-2 order-lg-2">
+                                <!-- filter-wrap  -->
+                                <div class="filter-wrap">
+                                    <!-- filter-form -->
+                                    <form class="filter-form">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <!-- filter-content -->
+                                                <!-- Filter by Specialization Start -->
+                                                <div class="filter-content">
+                                                    <div class="filter-title">
+                                                        <h6>Filter by Specialization</h6>
+                                                    </div>
+                                                    <ul>
+                                                        <!-- Loop start  -->
+                                                        <li>
+                                                            <div class="form-group cstm-checkbox style2">
+                                                                <input type="checkbox" id="Life_Coaching">
+                                                                <label for="Life_Coaching">Life Coaching</label>
+                                                            </div>
+                                                        </li>
+                                                        <!-- Loop END  -->
+                                                        <li>
+                                                            <div class="form-group cstm-checkbox style2">
+                                                                <input type="checkbox" id="Career">
+                                                                <label for="Career">Career</label>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="form-group cstm-checkbox style2">
+                                                                <input type="checkbox" id="Health">
+                                                                <label for="Health">Health</label>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="form-group cstm-checkbox style2">
+                                                                <input type="checkbox" id="Diet_Exercise_Plan">
+                                                                <label for="Diet_Exercise_Plan">Customized Diet and Exercise Plans</label>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <!-- Filter by Specialization END -->
+
+                                                <!-- filter-content -->
+                                                <!--  Filter by Availability Start-->
+                                                <div class="filter-content">
+                                                    <div class="filter-title">
+                                                        <h6> Filter by Availability</h6>
+                                                    </div>
+                                                    <ul>
+                                                        <!-- Loop start  -->
+                                                        <li>
+                                                            <div class="form-group cstm-checkbox style2">
+                                                                <input type="checkbox" id="High">
+                                                                <label for="High">High</label>
+                                                            </div>
+                                                        </li>
+                                                        <!-- Loop END  -->
+                                                        <li>
+                                                            <div class="form-group cstm-checkbox style2">
+                                                                <input type="checkbox" id="Medium">
+                                                                <label for="Medium">Medium</label>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="form-group cstm-checkbox style2">
+                                                                <input type="checkbox" id="Low">
+                                                                <label for="Low">Low</label>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <!--  Filter by Availability END-->
+
+                                                <!-- filter-content -->
+                                                <!--  Filter by  Ratings Start-->
+                                                <div class="filter-content">
+                                                    <div class="filter-title">
+                                                        <h6> Filter by  Ratings</h6>
+                                                    </div>
+                                                    <ul>
+                                                        <li>
+                                                            <div class="range-detail">
+                                                                <input type="text" value="1" />
+                                                                <input type="text" value="5"/>
+                                                            </div>
+                                                            <input type="range" class="form-range" id="customRange1">
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <!--  Filter by  Ratings END-->
+
+                                                <!-- filter-content -->
+                                                <!--  Filter by  Experience Start-->
+                                                <div class="filter-content">
+                                                    <div class="filter-title">
+                                                        <h6> Filter by  Experience</h6>
+                                                    </div>
+                                                    <ul>
+                                                        <!-- Loop start  -->
+                                                        <li>
+                                                            <div class="form-group cstm-checkbox style2">
+                                                                <input type="checkbox" id="one_year">
+                                                                <label for="one_year">1 year</label>
+                                                            </div>
+                                                        </li>
+                                                        <!-- Loop END  -->
+                                                        <li>
+                                                            <div class="form-group cstm-checkbox style2">
+                                                                <input type="checkbox" id="three_yaer">
+                                                                <label for="three_yaer">3 yaer</label>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="form-group cstm-checkbox style2">
+                                                                <input type="checkbox" id="five_year">
+                                                                <label for="five_year">5 year</label>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="form-group cstm-checkbox style2">
+                                                                <input type="checkbox" id="ten_year">
+                                                                <label for="ten_year">10 year</label>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <!--  Filter by  Experience END-->
+                                                <!-- filter-content -->
+                                                <!--  Filter by  Experience Start-->
+                                                <div class="filter-content">
+                                                    <div class="filter-btn">
+                                                        <button class="btn btn-mcolor">Filter</button>
+                                                        <button class="btn btn-outline">Reset</button>
+                                                    </div>
+                                                </div>
+                                                <!--  Filter by  Experience END-->
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="col-lg-8 col-xl-9 col-xxl-10 order-lg-1">
+                                <!-- coach-list-wrap -->
+                                <div class="coach-list-wrap">
+                                    <div class="row mb-4">
+                                        <div class="col-12">
+                                            <!-- coach-search-form -->
+                                            <form class="coach-search-form">
+                                                <div class="form-group">
+                                                    <input type="text" name="" value="" placeholder="Search" class="form-control" />
+                                                    <span class="input-icon"><i class="ri-search-line"></i></span>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <div class="row g-4 row-cols-xxl-3 row-cols-xl-2 row-cols-lg-2 row-cols-md-2 row-cols-1">
+                                        <!-- Loop Start  -->
+                                        {% for single_coach in all_coach_details %}
+                                        <div class="col">
+                                            <a href="{% url 'coach_details' single_coach.id%}" class="single-coach-wrap">
+                                                <!-- coach-info-card -->
+                                                <div class="coach-info-card">
+                                                    <div class="coach-info-content">
+                                                        <!-- coach-info-head  -->
+                                                        <div class="coach-info-head">
+                                                            <!-- coach-img -->
+                                                            <div class="coach-img">
+                                                                <img src="{{single_coach.coach_profile_image.url}}" lat="img/coach/coach-01" />
+                                                            </div>
+                                                            <!-- coach-ganeral-info-wrap -->
+                                                            <div class="coach-ganeral-info-wrap">
+                                                                <div class="coach-intro">
+                                                                    <h5 class="c_name">{{single_coach.coach_name}}</h5>
+                                                                    <span class="c_designation">{{single_coach.coach_expertise}}</span>
+                                                                </div>
+                                                                <!-- coach-education -->
+                                                                <div class="coach-education">
+                                                                    <span>
+                                                                        <img src="{% static 'assets/img/icon/svg/experience.svg' %}" alt="icon/svg/experience" />
+                                                                        {{single_coach.coach_experience}} yrs of Experience
+                                                                    </span>
+                                                                    <span>
+                                                                        <img src="{% static 'assets/img/icon/svg/degree.svg' %}" alt="icon/svg/degree" />
+                                                                        {{single_coach.coach_degree}}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <!-- coach-info-body -->
+                                                        <div class="coach-info-body">
+                                                            <p>{{single_coach.coach_about}}</p>
+                                                        </div>
+                                                    </div>
+                                                    <!-- coach-info-footer -->
+                                                    <div class="coach-info-footer">
+                                                        <a href="chat.html" class="btn start-session-btn">Start Session</a>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                        {% endfor %}
+                                        <!-- Loop END  -->
+                                        <div class="col">
+                                            <a href="coach_details.html" class="single-coach-wrap">
+                                                <!-- coach-info-card -->
+                                                <div class="coach-info-card">
+                                                    <div class="coach-info-content">
+                                                        <!-- coach-info-head  -->
+                                                        <div class="coach-info-head">
+                                                            <!-- coach-img -->
+                                                            <div class="coach-img">
+                                                                <img src="{% static 'assets/img/coach/coach-02.jpg' %}" lat="img/coach/coach-02" />
+                                                            </div>
+                                                            <!-- coach-ganeral-info-wrap -->
+                                                            <div class="coach-ganeral-info-wrap">
+                                                                <div class="coach-intro">
+                                                                    <h5 class="c_name">Amelia Smith</h5>
+                                                                    <span class="c_designation">Health Expart</span>
+                                                                </div>
+                                                                <!-- coach-education -->
+                                                                <div class="coach-education">
+                                                                    <span>
+                                                                        <img src="{% static 'assets/img/icon/svg/experience.svg' %}" alt="icon/svg/experience" />
+                                                                        5 Yrs of Experience
+                                                                    </span>
+                                                                    <span>
+                                                                        <img src="{% static 'assets/img/icon/svg/degree.svg' %}" alt="icon/svg/degree" />
+                                                                        MBA
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <!-- coach-info-body -->
+                                                        <div class="coach-info-body">
+                                                            <p>Embark on a delightful culinary adventure with Chef Amelia! A seasoned chef with a flair for creative cooking, Amelia is passionate about bringing people together through food. Her interactive cooking sessions are not just about recipes; they're about storytelling, technique, and the joy of creating something delicious.</p>
+                                                        </div>
+                                                    </div>
+                                                    <!-- coach-info-footer -->
+                                                    <div class="coach-info-footer">
+                                                            <a href="chat.html" class="btn start-session-btn">Start Session</a>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                        <div class="col">
+                                            <a href="coach_details.html" class="single-coach-wrap">
+                                                <!-- coach-info-card -->
+                                                <div class="coach-info-card">
+                                                    <div class="coach-info-content">
+                                                        <!-- coach-info-head  -->
+                                                        <div class="coach-info-head">
+                                                            <!-- coach-img -->
+                                                            <div class="coach-img">
+                                                                <img src="{% static 'assets/img/coach/coach-04.jpg' %}" lat="img/coach/coach-04" />
+                                                            </div>
+                                                            <!-- coach-ganeral-info-wrap -->
+                                                            <div class="coach-ganeral-info-wrap">
+                                                                <div class="coach-intro">
+                                                                    <h5 class="c_name">Mark Miller</h5>
+                                                                    <span class="c_designation">Health Expart</span>
+                                                                </div>
+                                                                <!-- coach-education -->
+                                                                <div class="coach-education">
+                                                                    <span>
+                                                                        <img src="{% static 'assets/img/icon/svg/experience.svg' %}" alt="icon/svg/experience" />
+                                                                        5 Yrs of Experience
+                                                                    </span>
+                                                                    <span>
+                                                                        <img src="{% static 'assets/img/icon/svg/degree.svg' %}" alt="icon/svg/degree" />
+                                                                        MBA
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <!-- coach-info-body -->
+                                                        <div class="coach-info-body">
+                                                            <p>Embark on a delightful culinary adventure with Chef Amelia! A seasoned chef with a flair for creative cooking, Amelia is passionate about bringing people together through food. Her interactive cooking sessions are not just about recipes; they're about storytelling, technique, and the joy of creating something delicious.</p>
+                                                        </div>
+                                                    </div>
+                                                    <!-- coach-info-footer -->
+                                                    <div class="coach-info-footer">
+                                                            <a href="chat.html" class="btn start-session-btn">Start Session</a>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                        <div class="col">
+                                            <a href="coach_details.html" class="single-coach-wrap">
+                                                <!-- coach-info-card -->
+                                                <div class="coach-info-card">
+                                                    <div class="coach-info-content">
+                                                        <!-- coach-info-head  -->
+                                                        <div class="coach-info-head">
+                                                            <!-- coach-img -->
+                                                            <div class="coach-img">
+                                                                <img src="{% static 'assets/img/coach/coach-01.jpg' %}" lat="img/coach/coach-01" />
+                                                            </div>
+                                                            <!-- coach-ganeral-info-wrap -->
+                                                            <div class="coach-ganeral-info-wrap">
+                                                                <div class="coach-intro">
+                                                                    <h5 class="c_name">Wade Warren</h5>
+                                                                    <span class="c_designation">Health Expart</span>
+                                                                </div>
+                                                                <!-- coach-education -->
+                                                                <div class="coach-education">
+                                                                    <span>
+                                                                        <img src="{% static 'assets/img/icon/svg/experience.svg' %}" alt="icon/svg/experience" />
+                                                                        5 Yrs of Experience
+                                                                    </span>
+                                                                    <span>
+                                                                        <img src="{% static 'assets/img/icon/svg/degree.svg' %}" alt="icon/svg/degree" />
+                                                                        MBA
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <!-- coach-info-body -->
+                                                        <div class="coach-info-body">
+                                                            <p>Embark on a delightful culinary adventure with Chef Amelia! A seasoned chef with a flair for creative cooking, Amelia is passionate about bringing people together through food. Her interactive cooking sessions are not just about recipes; they're about storytelling, technique, and the joy of creating something delicious.</p>
+                                                        </div>
+                                                    </div>
+                                                    <!-- coach-info-footer -->
+                                                    <div class="coach-info-footer">
+                                                            <a href="chat.html" class="btn start-session-btn">Start Session</a>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                        <div class="col">
+                                            <a href="coach_details.html" class="single-coach-wrap">
+                                                <!-- coach-info-card -->
+                                                <div class="coach-info-card">
+                                                    <div class="coach-info-content">
+                                                        <!-- coach-info-head  -->
+                                                        <div class="coach-info-head">
+                                                            <!-- coach-img -->
+                                                            <div class="coach-img">
+                                                                <img src="{% static 'assets/img/coach/coach-02.jpg' %}" lat="img/coach/coach-02" />
+                                                            </div>
+                                                            <!-- coach-ganeral-info-wrap -->
+                                                            <div class="coach-ganeral-info-wrap">
+                                                                <div class="coach-intro">
+                                                                    <h5 class="c_name">Amelia Smith</h5>
+                                                                    <span class="c_designation">Health Expart</span>
+                                                                </div>
+                                                                <!-- coach-education -->
+                                                                <div class="coach-education">
+                                                                    <span>
+                                                                        <img src="{% static 'assets/img/icon/svg/experience.svg' %}" alt="icon/svg/experience" />
+                                                                        5 Yrs of Experience
+                                                                    </span>
+                                                                    <span>
+                                                                        <img src="{% static 'assets/img/icon/svg/degree.svg' %}" alt="icon/svg/degree" />
+                                                                        MBA
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <!-- coach-info-body -->
+                                                        <div class="coach-info-body">
+                                                            <p>Embark on a delightful culinary adventure with Chef Amelia! A seasoned chef with a flair for creative cooking, Amelia is passionate about bringing people together through food. Her interactive cooking sessions are not just about recipes; they're about storytelling, technique, and the joy of creating something delicious.</p>
+                                                        </div>
+                                                    </div>
+                                                    <!-- coach-info-footer -->
+                                                    <div class="coach-info-footer">
+                                                            <a href="chat.html" class="btn start-session-btn">Start Session</a>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                        <div class="col">
+                                            <a href="coach_details.html" class="single-coach-wrap">
+                                                <!-- coach-info-card -->
+                                                <div class="coach-info-card">
+                                                    <div class="coach-info-content">
+                                                        <!-- coach-info-head  -->
+                                                        <div class="coach-info-head">
+                                                            <!-- coach-img -->
+                                                            <div class="coach-img">
+                                                                <img src="{% static 'assets/img/coach/coach-04.jpg' %}" lat="img/coach/coach-04" />
+                                                            </div>
+                                                            <!-- coach-ganeral-info-wrap -->
+                                                            <div class="coach-ganeral-info-wrap">
+                                                                <div class="coach-intro">
+                                                                    <h5 class="c_name">Mark Miller</h5>
+                                                                    <span class="c_designation">Health Expart</span>
+                                                                </div>
+                                                                <!-- coach-education -->
+                                                                <div class="coach-education">
+                                                                    <span>
+                                                                        <img src="{% static 'assets/img/icon/svg/experience.svg' %}" alt="icon/svg/experience" />
+                                                                        5 Yrs of Experience
+                                                                    </span>
+                                                                    <span>
+                                                                        <img src="{% static 'assets/img/icon/svg/degree.svg' %}" alt="icon/svg/degree" />
+                                                                        MBA
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <!-- coach-info-body -->
+                                                        <div class="coach-info-body">
+                                                            <p>Embark on a delightful culinary adventure with Chef Amelia! A seasoned chef with a flair for creative cooking, Amelia is passionate about bringing people together through food. Her interactive cooking sessions are not just about recipes; they're about storytelling, technique, and the joy of creating something delicious.</p>
+                                                        </div>
+                                                    </div>
+                                                    <!-- coach-info-footer -->
+                                                    <div class="coach-info-footer">
+                                                            <a href="chat.html" class="btn start-session-btn">Start Session</a>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- main-content END -->
+    </section>
+    <!-- page-layout END -->
+
+
+    {% endblock %}

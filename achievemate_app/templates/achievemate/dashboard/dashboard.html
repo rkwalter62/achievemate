@@ -1,0 +1,179 @@
+{% extends "achievemate/dashboard/dashboard_base.html" %}
+{% load static %}
+{% block content %}
+    <!-- page-layout Start -->
+    <section class="page-layout">
+        <!-- mobile_view_header Start-->
+        <header class="header mobile_view_header">
+            <div class="container-fluid">
+                <div class="nav-main">
+                    <div class="logo-wrapper">
+                        <div class="navbar-brand">
+                            <a class="" href="#">
+                                <img src="{% static 'assets/img/logo.svg' %}" alt="logo">
+                            </a>
+                        </div>
+                    </div>
+                    <!-- minimize_toggle -->
+                    <div class="header-wrapper">
+                        <span class="minimize_toggle">
+                            <i class="ri-arrow-right-s-line"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <!-- mobile_view_header END-->
+
+        <!-- page-topbar Start -->
+        <div class="page-topbar">
+            <div class="conteiner-fluid">
+                <div class="row align-items-center">
+                    <div class="col-12">
+                        <!-- breadcrumb -->
+                        <div class="breadcrumb-wrap">
+                            <nav aria-label="breadcrumb">
+                                <ul class="breadcrumb">
+                                    <li class="breadcrumb-item">Pages</li>
+                                    <li class="breadcrumb-item" aria-current="page">Dashboard</li>
+                                </ul>
+                            </nav>
+                            <!-- page-title -->
+                            <div class="page-title">
+                                <h2>Dashboard</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- page-topbar END -->
+
+        <!-- main-content start  -->
+        <div class="main-content">
+            <div class="row">
+                <div class="col-12">
+                    <div class="table-responsive">
+                        <div class="simple-table sticky-table">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <div class="task-head">
+                                                <span class="task-title">task name</span>
+                                                Health Expert
+                                            </div>
+                                        </th>
+                                        <th>Coach Name</th>
+                                        <th>Status</th>
+                                        <th>Activity</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Loop start  -->
+                                    <tr>
+                                        <td>
+                                            <div class="task-data">
+                                                <span class="task-data-title">Achieve a healthy and sustainable
+                                                    weight.</span>
+                                                <span class="task-data-time"> Due : 27 Dec,203 </span>
+                                            </div>
+                                        </td>
+                                        <td>Wade Warren</td>
+                                        <td>
+                                            <span class="badge bg-success">In progress</span>
+                                        </td>
+                                        <td>Write comment</td>
+                                    </tr>
+                                    <!-- Loop END  -->
+                                    <tr>
+                                        <td>
+                                            <div class="task-data">
+                                                <span class="task-data-title">Improve cardiovascular fitness through
+                                                    aerobic exercises.</span>
+                                                <span class="task-data-time"> Due : 27 Dec,203 </span>
+                                            </div>
+                                        </td>
+                                        <td>Michael Williams</td>
+                                        <td>
+                                            <span class="badge bg-success">In progress</span>
+                                        </td>
+                                        <td>Show activity (1)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="task-data">
+                                                <span class="task-data-title">Maintain a balanced diet with appropriate
+                                                    caloric intake.</span>
+                                                <span class="task-data-time"> Due : 27 Dec,203 </span>
+                                            </div>
+                                        </td>
+                                        <td>Wade Warren</td>
+                                        <td>
+                                            <span class="badge bg-danger">Late</span>
+                                        </td>
+                                        <td>Show activity (1)</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="999" class="text-center text-scolor">
+                                            No Record Found!
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="table-responsive">
+                        <div class="simple-table sticky-table">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <div class="task-head">
+                                                <span class="task-title">task name</span>
+                                                Health Expert
+                                            </div>
+                                        </th>
+                                        <th>Coach Name</th>
+                                        <th>Status</th>
+                                        <th>Activity</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Loop start  -->
+                                    <tr>
+                                        <td>
+                                            <div class="task-data">
+                                                <span class="task-data-title">Work on non-verbal communication skills,
+                                                    such as body language and eye contact.
+                                                    Due : 27 Dec,203</span>
+                                                <span class="task-data-time"> Due : 27 Dec,203 </span>
+                                            </div>
+                                        </td>
+                                        <td>Wade Warren</td>
+                                        <td>
+                                            <span class="badge bg-success">In progress</span>
+                                        </td>
+                                        <td>Write comment</td>
+                                    </tr>
+                                    <!-- Loop END  -->
+                                    <tr>
+                                        <td colspan="999" class="text-center text-scolor">
+                                            No Record Found!
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- main-content END -->
+    </section>
+    <!-- page-layout END -->
+{% endblock %}

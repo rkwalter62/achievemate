@@ -1,0 +1,129 @@
+{% extends "achievemate/main_base.html" %}
+{% load static %}
+{% block content %}
+
+        <!-- page-title-section Start  -->
+        <section class="page-title-section testimonial-page">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="breadcrumb-wrap">
+                            <nav aria-label="breadcrumb">
+                                <ul class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Testimonials</li>
+                                </ul>
+                            </nav>
+                            <!-- page-title -->
+                            <div class="page-title">
+                                <h2>Testimonials</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- page-title-section END  -->
+
+        <!-- testimonial-section-Start --> 
+        <section class="testimonial-section">
+            <div class="container">
+                <div class="row g-3 g-xl-5 row-cols-1 row-cols-xl-2 row-cols-lg-2 row-cols-md-2 row-cols-sm-2 ">
+                    <!-- Loop start -->
+                    <div class="col">
+                        <!-- testimonial-wrap -->
+                        <div class="testimonial-wrap">
+                            <!-- testimonial-head -->
+                            <div class="testimonial-head">
+                                <img src="{% static  'assets/img/testimonial/author01.jpg' %}" alt="testimonial/author01" />
+                            </div>
+                            <!-- testimonial-content -->
+                            <div class="testimonial-content">
+                                <!-- blockquote -->
+                                <blockquote>"Joining AchieveMate was a game-changer for my culinary journey. The cooking courses are fantastic, and the personalized feedback from Chef Mia has been incredibly helpful. I've learned so many new techniques and recipes, and my family loves the new dishes I'm making. It's like having a culinary school at my fingertips!"</blockquote>
+                                <div class="testimonial-author">
+                                    <span class="name">Emily R.,</span>
+                                    <span class="role">Aspiring Chef</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Loop END -->
+                    <div class="col">
+                        <!-- testimonial-wrap -->
+                        <div class="testimonial-wrap">
+                            <!-- testimonial-head -->
+                            <div class="testimonial-head">
+                                <img src="{% static  'assets/img/testimonial/author02.jpg' %}" alt="testimonial/author02" />
+                            </div>
+                            <!-- testimonial-content -->
+                            <div class="testimonial-content">
+                                <!-- blockquote -->
+                                <blockquote>"I was skeptical about AI coaching at first, but AchieveMate has completely changed my perspective. The finance coaching has helped me get a grip on my budgeting and investment strategies. It's like having a personal financial advisor in my pocket. The app is user-friendly, and the advice is always spot on. Highly recommend it!"</blockquote>
+                                <div class="testimonial-author">
+                                    <span class="name">David L., </span>
+                                    <span class="role">Tech Professional</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <!-- testimonial-wrap -->
+                        <div class="testimonial-wrap">
+                            <!-- testimonial-head -->
+                            <div class="testimonial-head">
+                                <img src="{% static  'assets/img/testimonial/author03.jpg' %}" alt="testimonial/author03" />
+                            </div>
+                            <!-- testimonial-content -->
+                            <div class="testimonial-content">
+                                <!-- blockquote -->
+                                <blockquote>"AchieveMate's yoga sessions have been a blessing for both my body and mind. Coach Liam's guidance feels so personal and intuitive. The sessions are perfectly paced, and I love how I can track my progress. It's amazing how a virtual coach can be so motivating and insightful. This app is a must-try for anyone looking to deepen their yoga practice."</blockquote>
+                                <div class="testimonial-author">
+                                    <span class="name">Anita G., </span>
+                                    <span class="role">Yoga Enthusiast</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <!-- testimonial-wrap -->
+                        <div class="testimonial-wrap">
+                            <!-- testimonial-head -->
+                            <div class="testimonial-head">
+                                <img src="{% static  'assets/img/testimonial/author04.jpg' %}" alt="testimonial/author04" />
+                            </div>
+                            <!-- testimonial-content -->
+                            <div class="testimonial-content">
+                                <!-- blockquote -->
+                                <blockquote>"As a student, I find AchieveMate incredibly useful for managing my time and staying on top of my goals. The AI coach really helps in breaking down big tasks into manageable steps. I've seen a significant improvement in my productivity and stress levels. It's like having a personal mentor always ready to help."</blockquote>
+                                <div class="testimonial-author">
+                                    <span class="name">Marcus T., </span>
+                                    <span class="role">College Student</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <!-- testimonial-wrap -->
+                        <div class="testimonial-wrap">
+                            <!-- testimonial-head -->
+                            <div class="testimonial-head">
+                                <img src="{% static  'assets/img/testimonial/author05.jpg' %}" alt="testimonial/author05" />
+                            </div>
+                            <!-- testimonial-content -->
+                            <div class="testimonial-content">
+                                <!-- blockquote -->
+                                <blockquote>"I've tried many fitness apps, but none compare to AchieveMate. Coach Alex's workout plans are challenging yet achievable, and I love the personalized nutrition advice. I've achieved fitness goals I never thought possible and have never felt healthier. This app is a true partner in fitness."</blockquote>
+                                <div class="testimonial-author">
+                                    <span class="name">Sophia B., </span>
+                                    <span class="role">Fitness Enthusiast</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- testimonial-section END -->
+
+{% endblock %}

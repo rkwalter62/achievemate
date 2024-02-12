@@ -1,0 +1,330 @@
+{% extends "achievemate/dashboard/dashboard_base.html" %}
+{% load static %}
+{% block content %}
+    <!-- page-layout Start -->
+    <section class="page-layout">
+        <!-- mobile_view_header Start-->
+        <header class="header mobile_view_header">
+            <div class="container-fluid">
+                <div class="nav-main">
+                    <div class="logo-wrapper">
+                        <div class="navbar-brand">
+                            <a class="" href="#">
+                                <img src="{% static 'assets/img/logo.svg' %}" alt="logo">
+                            </a>
+                        </div>
+                    </div>
+                    <!-- minimize_toggle -->
+                    <div class="header-wrapper">
+                        <span class="minimize_toggle">
+                            <i class="ri-arrow-right-s-line"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <!-- mobile_view_header END-->
+
+         <!-- page-topbar Start -->
+         <div class="page-topbar">
+            <div class="conteiner-fluid">
+                <div class="row align-items-center">
+                    <div class="col-12">
+                        <!-- breadcrumb -->
+                        <div class="breadcrumb-wrap">
+                            <nav aria-label="breadcrumb">
+                                <ul class="breadcrumb">
+                                    <li class="breadcrumb-item">Pages</li>
+                                    <li class="breadcrumb-item" aria-current="page">Chat</li>
+                                </ul>
+                            </nav>
+                            <!-- page-title -->
+                            <div class="page-title">
+                                <h2><a href="coach.html"><i class="ri-arrow-left-line"></i></a> Chat</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- page-topbar END -->
+
+        <!-- main-content start  -->
+        <div class="main-content">
+            <div class="row">
+                <div class="col-12">
+                    <!-- section-title -->
+                    <div class="section-title">
+                        <h4>CHAT WITH  coach's</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="row g-4 mt-0">
+                <div class="col-lg-12 col-xl-5 col-md-12">
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <!-- chat-owner-list Start -->
+                            <div class="chat-owner-list">
+                                <!-- chat-owner-body Start -->
+                                <div class="chat-owner-body">
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <!-- chat-sender-list Start -->
+                                            <div class="chat-sender-list">
+                                                <ul>
+                                                    <!-- Loop Start  -->
+                                                    <li class="view-chat"><!-- add view-chat class on click  -->
+                                                        <div class="chat-sender">
+                                                            <!-- sender-img -->
+                                                            <div class="sender-img">
+                                                                <img src="{% static 'assets/img/chat-user.svg' %}" alt="">
+                                                            </div>
+                                                            <div class="sender-massage">
+                                                                <!-- sender-name  -->
+                                                                <h5 class="sender-name">Jonathan Munro</h5>
+                                                                <p class="sender-text">Customized Diet and Exercise Plans</p>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <!-- Loop END  -->
+                                                    <li class="">
+                                                        <div class="chat-sender">
+                                                            <!-- sender-img -->
+                                                            <div class="sender-img">
+                                                                <img src="{% static 'assets/img/chat-user.svg' %}" alt="">
+                                                            </div>
+                                                            <div class="sender-massage">
+                                                                <!-- sender-name  -->
+                                                                <h5 class="sender-name">Jonathan Munro</h5>
+                                                                <p class="sender-text">Customized Diet and Exercise Plans</p>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li class="">
+                                                        <div class="chat-sender">
+                                                            <!-- sender-img -->
+                                                            <div class="sender-img">
+                                                                <img src="{% static 'assets/img/chat-user.svg' %}" alt="">
+                                                            </div>
+                                                            <div class="sender-massage">
+                                                                <!-- sender-name  -->
+                                                                <h5 class="sender-name">Jonathan Munro</h5>
+                                                                <p class="sender-text">Customized Diet and Exercise Plans</p>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <!-- chat-sender-list END -->
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- chat-owner-body END -->
+                            </div>
+                            <!-- chat-owner-list END -->
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12 col-xl-7 col-md-12">
+                    <div class="card chat-card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="chat-wrapper">
+                                        <!-- usertalk-wrapper Start -->
+                                        <div class="usertalk-wrapper" id="messages">
+                                            <!-- owner msg  -->
+                                            <div class="usertalk-inner">
+                                                <div class="chatuser-img">
+                                                    <img src="{% static 'assets/img/chat-user.svg' %}" class="img-responsive">
+                                                </div>
+                                                <div class="userleft-msg">
+                                                    <!-- msg display  -->
+                                                    <img src="{% static 'assets/img/icon/svg/send-file.svg' %}" alt="icon/svg/send-file" class="send-file" />
+                                                    <span>Review this test and provide feedback on how it can be improved or adjusted to better measure the student's knowledge and understanding of the subject being tested.</span>
+                                                    <div class="msg-dt">
+                                                        <!-- time  -->
+                                                        <label>Just now</label>
+                                                        <div class="action-button-list">
+                                                            <button class="btn-scolor"><i class="ri-add-line"></i>Add to task</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- msg reply -->
+                                            <div class="usertalk-inner reply-inner">
+                                                <div class="chatuser-img">
+                                                    <img src="{% static 'assets/img/chat-user.svg' %}" class="img-responsive">
+                                                </div>
+                                                <div class="userleft-msg">
+                                                    
+                                                    <span> Review this test and provide feedback on how it can be improved or adjusted to better measure the student's knowledge and understanding of the subject being tested.</span>
+                                                    <div class="msg-dt">
+                                                        <label>just now</label>
+                                                        <div class="action-button-list">
+                                                            <button class="btn-scolor"><i class="ri-add-line"></i>Add to task</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="usertalk-inner">
+                                                <div class="chatuser-img">
+                                                    <img src="{% static 'assets/img/chat-user.svg' %}" class="img-responsive">
+                                                </div>
+                                                <div class="userleft-msg">
+                                                    <!-- typing -->
+                                                    <span>
+                                                        <div class="typing">
+                                                            <span class="circle"></span>
+                                                            <span class="circle"></span>
+                                                            <span class="circle"></span>
+                                                        </div>
+                                                    </span>
+                                                    <!-- puase btn  -->
+                                                    <div class="msg-dt">
+                                                        <button class="btn-scolor"><i class="ri-add-line"></i>Add to task</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- usertalk-wrapper END -->
+
+                                        <!-- chattype-wrapper start  -->
+                                        <div class="chattype-wrapper">
+                                            <div class="typeinput-wrapper">
+                                                <!-- file upload btn -->
+                                                <div class="input-file-icon">
+                                                    <div class="upload-btn-wrapper">
+                                                        <button class="border-0 p-0 bg-transparent"><img src="{% static 'assets/img/icon/svg/input-file.svg' %}" alt="icon/input-file"></button>
+                                                        <input type="file" name="myfile">
+                                                    </div>
+                                                </div>
+                                                <div class="input-main-input">
+                                                    <input type="text" id='message-input' class="form-control" placeholder="Type '/' for commands">
+                                                </div>
+                                                <!-- chatsend-btn -->
+                                                <div class="chatsend-btn">
+                                                    <button class="" id="send-btn">
+                                                        <i class="ri-send-plane-fill"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- chattype-wrapper END  -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- main-content END -->
+    </section>
+    <!-- page-layout END -->
+    {% endblock %}
+    {% block script %}
+    <script>
+        // WebSocket connection
+        const uid ="{{uid}}";
+        const cid ="{{cid}}";
+        {% comment %} console.log(uid,cid); {% endcomment %}
+        const roomName = `room_${uid}_${cid}`;
+        const socket = new WebSocket(`ws://localhost:8000/ws/chat/${roomName}/`);
+        console.log(socket)
+        // Event listeners
+        socket.onopen = function(event) {
+            console.log('WebSocket connection established');
+        };
+
+        socket.onmessage = function(event) {
+            const message = JSON.parse(event.data).message;
+            $('#messages').append(`<div>${message}</div>`);
+        };
+
+          {% comment %} // Function to update messages
+          function updateMessages() {
+                $.ajax({
+                    url: "{% url 'get_messages' %}",
+                    type: 'GET',
+                    success: function(data) {
+                        $('#messages').html(data);
+                    }
+                });
+            }; {% endcomment %}
+            function updateMessages() {
+                $.ajax({
+                    url: "{% url 'get_messages' %}",
+                    type: 'GET',
+                    success: function(data) {
+                        console.log(data)
+                        var messages = data.messages;
+                        // Assuming data is an array of chat objects
+                        $('#messages').empty(); // Clear previous messages
+                        messages.forEach(function(chat) {
+                            // Construct the HTML for each chat message
+                            var messageHtml = `
+                                <div class="usertalk-inner">
+                                    <div class="chatuser-img">
+                                        <img src="{% static 'assets/img/chat-user.svg' %}" class="img-responsive">
+                                    </div>
+                                    <div class="userleft-msg">
+                                        <span>${chat}</span>
+                                        <div class="msg-dt">
+                                            <label>just now</label>
+                                            <div class="action-button-list">
+                                                <button class="btn-scolor"><i class="ri-add-line"></i>Add to task</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                            // Append the message to the messages container
+                            $('#messages').append(messageHtml);
+                        });
+                    }
+                });
+            };
+            
+        // Update messages when the page loads
+        $(document).ready(function() {
+            updateMessages();
+        });
+
+        // Event listener for send button
+        $(document).ready(function() {
+        const csr = $("input[name=csrfmiddlewaretoken]").val();
+        $('#send-btn').click(function() {
+            const message = $('#message-input').val().trim();
+            console.log(message)
+            var formData ={
+                //'csrfmiddlewaretoken': csr,
+                'csrfmiddlewaretoken':$( "#csrfmiddlewaretoken" ).val(),
+                'message': message,
+                'uid':uid,
+                'cid':cid,
+            };
+            if (message !== '') {
+                $.ajax({
+                    url: "{% url 'send_message' %}",
+                    method: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        socket.send(JSON.stringify({'message': message}));
+                        $('#message-input').val('');
+                        updateMessages();
+                        alert(response.status)
+                    }
+                });
+            }
+        });
+    });
+        // Handle Enter key press
+        $('#message-input').keypress(function(event) {
+            if (event.which === 13) {
+                $('#send-btn').click();
+            }
+        });
+    </script>
+
+    {% endblock %}

@@ -1,0 +1,129 @@
+{% extends "achievemate/dashboard/dashboard_base.html" %}
+{% load static %}
+{% block content %}
+    <!-- page-layout Start -->
+    <section class="page-layout">
+        <!-- mobile_view_header Start-->
+        <header class="header mobile_view_header">
+            <div class="container-fluid">
+                <div class="nav-main">
+                    <div class="logo-wrapper">
+                        <div class="navbar-brand">
+                            <a class="" href="#">
+                                <img src="{% static 'assets/img/logo.svg' %}" alt="logo">
+                            </a>
+                        </div>
+                    </div>
+                    <!-- minimize_toggle -->
+                    <div class="header-wrapper">
+                        <span class="minimize_toggle">
+                            <i class="ri-arrow-right-s-line"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <!-- mobile_view_header END-->
+
+         <!-- page-topbar Start -->
+         <div class="page-topbar">
+            <div class="conteiner-fluid">
+                <div class="row align-items-center">
+                    <div class="col-12">
+                        <!-- breadcrumb -->
+                        <div class="breadcrumb-wrap">
+                            <nav aria-label="breadcrumb">
+                                <ul class="breadcrumb">
+                                    <li class="breadcrumb-item">Pages</li>
+                                    <li class="breadcrumb-item" aria-current="page">Progress Tracking</li>
+                                </ul>
+                            </nav>
+                            <!-- page-title -->
+                            <div class="page-title">
+                                <h2> Progress Tracking</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- page-topbar END -->
+
+        <!-- main-content start  -->
+        <div class="main-content">
+            <div class="row g-4 mt-0">
+                <!-- Task data Point Start -->
+                <div class="col-12 col-lg-6">
+                    <div class="card no-padding-card progress-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Task data Point</h3>
+                            <div class="d-flex gap-3 align-items-center flex-wrap">
+                                <!-- select -->
+                                <form>
+                                    <select class="form-select form-select-sm" aria-label="Default select example">
+                                        <option selected="">Monthly</option>
+                                        <option value="1">One</option>
+                                        <option value="2">Two</option>
+                                        <option value="3">Three</option>
+                                    </select>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-12">
+                                    <!-- graph -->
+                                    <div class="text-center">
+                                        <img src="{% static 'assets/img/chart01.png' %}" alt="img/chart01.png" class="img-responsive mh-240">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Task data Point END -->
+
+                <!-- tracking-card Start -->
+                <div class="col-12 col-lg-6">
+                    <div class="row g-4">
+                        <div class="col-12 col-md-6 col-lg-12">
+                            <div class="tracking-card">
+                                <h2>10</h2>
+                                <h4>Tasks not started yet</h4>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-12">
+                            <div class="tracking-card yellow-card">
+                                <h2>26</h2>
+                                <h4>task overdue</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- tracking-card END -->
+
+                <!-- Task Status Start -->
+                <div class="col-12">
+                    <div class="card no-padding-card progress-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Task Status</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-12">
+                                    <!-- graph -->
+                                    <div class="text-center">
+                                        <img src="{% static 'assets/img/chart02.png' %}" alt="img/chart02.png" class="img-responsive mh-240">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Task Status END -->
+            </div>
+        </div>
+        <!-- main-content END -->
+    </section>
+    <!-- page-layout END -->
+{% endblock %}

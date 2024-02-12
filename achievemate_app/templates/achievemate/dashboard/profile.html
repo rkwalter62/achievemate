@@ -1,0 +1,174 @@
+{% extends "achievemate/dashboard/dashboard_base.html" %}
+{% load static %}
+{% block content %}
+    <!-- page-layout Start -->
+    <section class="page-layout">
+        <!-- mobile_view_header Start-->
+        <header class="header mobile_view_header">
+            <div class="container-fluid">
+                <div class="nav-main">
+                    <div class="logo-wrapper">
+                        <div class="navbar-brand">
+                            <a class="" href="#">
+                                <img src="{% static 'assets/img/logo.svg' %}" alt="logo">
+                            </a>
+                        </div>
+                    </div>
+                    <!-- minimize_toggle -->
+                    <div class="header-wrapper">
+                        <span class="minimize_toggle">
+                            <i class="ri-arrow-right-s-line"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <!-- mobile_view_header END-->
+
+         <!-- page-topbar Start -->
+         <div class="page-topbar">
+            <div class="conteiner-fluid">
+                <div class="row align-items-center">
+                    <div class="col-12">
+                        <!-- breadcrumb -->
+                        <div class="breadcrumb-wrap">
+                            <nav aria-label="breadcrumb">
+                                <ul class="breadcrumb">
+                                    <li class="breadcrumb-item">Pages</li>
+                                    <li class="breadcrumb-item" aria-current="page">Profile</li>
+                                </ul>
+                            </nav>
+                            <!-- page-title -->
+                            <div class="page-title">
+                                <h2> Profile</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- page-topbar END -->
+
+        <!-- main-content start  -->
+        <div class="main-content">
+            <div class="row">
+                <div class="col-12">
+                    <!-- section-title -->
+                    <div class="section-title">
+                        <h4>User Profile</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="row g-4 mt-0">
+                <div class="col-12">
+                    <div class="row">
+                        <div class="col-xxl-10">
+                            <form class="edit-profile-form w-100">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <!-- profile-header -->
+                                        <div class="profile-header">
+                                            <!-- profile -->
+                                            <div class="profile">
+                                                <!-- profile-img -->
+                                                <div class="profile-img">
+                                                    <img src="{% static 'assets/img/profile.png' %}" alt="img/profile" />
+                                                </div>
+                                                <div class="profile-content">
+                                                    <!-- p_name -->
+                                                    <h4 class="p_name">johnda Dev</h4>
+                                                    <!-- p_designation -->
+                                                    <span class="p_designation">Product Design</span>
+                                                    <!-- p_location -->
+                                                    <span class="p_location">Lagos, Nigeria</span>
+                                                </div>
+                                            </div>
+                                            <!-- profile-action -->
+                                            <div class="profile-action">
+                                                <!-- cstm-profile-upload/  -->
+                                                <div class="cstm-profile-upload">
+                                                    <div class="upload-btn-wrapper">
+                                                        <button class="btn btn-scolor">Upload New Photo </button>
+                                                        <input type="file" name="myfile">
+                                                    </div>
+                                                </div>
+                                                <!-- Delete btn  -->
+                                                <button class="btn btn-outline">Delete</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row g-4">
+                                    <!-- First Name -->
+                                    <div class="col-lg-6 col-xl-4 col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-label">First Name</label>
+                                            <input type="text" name="" value="johndoe" placeholder="" class="form-control" />
+                                        </div>
+                                    </div>
+                                    <!-- Last Name -->
+                                    <div class="col-lg-6 col-xl-4 col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-label">Last Name</label>
+                                            <input type="text" name="" value="Dev" placeholder="" class="form-control" />
+                                        </div>
+                                    </div>
+                                    <!-- Email Address -->
+                                    <div class="col-lg-6 col-xl-4 col-md-6">
+                                        <div class="form-group with-label with-icon icon-start">
+                                            <label class="form-label">Email Address</label>
+                                            <input type="text" name="" value="" placeholder="" class="form-control" />
+                                            <span class="input-icon"><i class="ri-mail-fill"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- divider  -->
+                                <div class="row mt-4 mb-4">
+                                    <div class="col-12">
+                                        <hr />
+                                    </div>
+                                </div>
+                                <div class="row g-4">
+                                    <!-- Current Password -->
+                                    <div class="col-lg-6 col-xl-4 col-md-6">
+                                        <div class="form-group with-label with-icon icon-start">
+                                            <label class="form-label">Current Password</label>
+                                            <input type="text" name="" value="" placeholder="" class="form-control" />
+                                            <span class="input-icon"><i class="ri-key-fill"></i></span>
+                                        </div>
+                                    </div>
+                                    <!-- New Password -->
+                                    <div class="col-lg-6 col-xl-4 col-md-6">
+                                        <div class="form-group with-label with-icon icon-start">
+                                            <label class="form-label">New Password</label>
+                                            <input type="text" name="" value="" placeholder="" class="form-control" />
+                                            <span class="input-icon"><i class="ri-key-fill"></i></span>
+                                        </div>
+                                    </div>
+                                    <!-- Confirm New Password -->
+                                    <div class="col-lg-6 col-xl-4 col-md-6">
+                                        <div class="form-group with-label with-icon icon-start">
+                                            <label class="form-label">Confirm New Password</label>
+                                            <input type="text" name="" value="" placeholder="" class="form-control" />
+                                            <span class="input-icon"><i class="ri-key-fill"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row g-4 mt-2">
+                                    <div class="col-12">
+                                        <div class="d-flex gap-3 justify-content-xl-end justify-content-center">
+                                            <button class="btn btn-outline">Cancel</button>
+                                            <button class="btn btn-scolor">Save Changes</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- main-content END -->
+    </section>
+    <!-- page-layout END -->
+{% endblock %}

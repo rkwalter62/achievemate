@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AchieveMate</title>
+    <!-- <link rel="stylesheet" href="css/style.css' %}"> -->
+    <!-- bootstrap css -->
+    <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/shortcode.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/responsive.css' %}">
+    <!-- remixicon css -->
+    <link rel="stylesheet" href="{% static 'assets/css/remixicon.css' %}">
+</head>
+
+<body>
+    
+    <!-- Sidebar STart -->
+    <nav class="sidebar">
+        <!-- logo -->
+        <div class="logo-wrapper">
+            <div class="navbar-brand">
+                <a class="" href="{% url 'index' %}">
+                    <img src="{% static 'assets/img/logo.svg' %}" alt="logo.svg' %}" class="main-logo" />
+                </a>
+            </div>
+        </div>
+        <!-- toggle -->
+        <!-- menu-bar -->
+        <div class="menu-bar">
+            <div id="sidebar-menu" class="menu">
+                <!-- menu-links -->
+                <div class="menu-links">
+                    <!-- menu-list -->
+                    <div class="menu-list">
+                        <ul class="menu-list-item">
+                            <!-- Dashboard -->
+                            <li class="nav-link"><!-- add active class on click -->
+                                <a href="{% url 'dashbaord' %}">
+                                    <span class="nav-link-icon">
+                                        <img src="{% static 'assets/img/icon/svg/sidebar/dashboard.svg' %}"
+                                            alt="icon/svg/sidebar/dashboard">
+                                    </span>
+                                    <span class="text nav-text">Dashboard</span>
+                                </a>
+                            </li>
+                            <!-- Coach  -->
+                            <li class="nav-link active">
+                                <a href="{% url 'coach' %}">
+                                    <span class="nav-link-icon">
+                                        <img src="{% static 'assets/img/icon/svg/sidebar/coach.svg' %}"
+                                            alt="icon/svg/sidebar/coach">
+                                    </span>
+                                    <span class="text nav-text">Coach </span>
+                                </a>
+                            </li>
+                            <!-- Chat  -->
+                            <li class="nav-link">
+                                <a href="{% url 'chat' %}">
+                                    <span class="nav-link-icon">
+                                        <img src="{% static 'assets/img/icon/svg/sidebar/chat.svg' %}" alt="icon/svg/sidebar/chat">
+                                    </span>
+                                    <span class="text nav-text">Chat </span>
+                                </a>
+                            </li>
+                            <!-- Progress Tracking  -->
+                            <li class="nav-link">
+                                <a href="{% url 'progress_tracking' %}" class="">
+                                    <span class="nav-link-icon">
+                                        <img src="{% static 'assets/img/icon/svg/sidebar/Progress_Tracking.svg' %}"
+                                            alt="icon/svg/sidebar/Progress_Tracking">
+                                    </span>
+                                    <span class="text nav-text">Progress Tracking </span>
+                                </a>
+                            </li>
+                            <!-- Profile  -->
+                            <li class="nav-link">
+                                <a href="{% url 'profile' %}">
+                                    <span class="nav-link-icon">
+                                        <img src="{% static 'assets/img/icon/svg/sidebar/profile.svg' %}"
+                                            alt="icon/svg/sidebar/profile">
+                                    </span>
+                                    <span class="text nav-text">Profile </span>
+                                </a>
+                            </li>
+                        </ul>
+                        <!-- Logout -->
+                        <ul class="">
+                            <li class="nav-link logout-btn">
+                                <a href="#" data-bs-toggle="modal" data-bs-target="#UserLogout">
+                                    <span class="nav-link-icon">
+                                        <i class="ri-logout-box-r-line"></i>
+                                    </span>
+                                    <span class="text nav-text">Logout</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <!-- Sidebar END -->
+
+
+    {% block content %}
+
+    {% endblock %}
+
+
+
+
+
+    <!-- Modal Logout popup Start -->
+    <div class="modal fade" id="UserLogout" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><i
+                        class="ri-close-line"></i></button> -->
+                <div class="modal-body">
+                    <!-- SignIn form Details  Start -->
+                    <div class="auth-wrapper">
+                        <div class="logout-wrap text-center">
+                            <img src="{% static 'assets/img/alert.png' %}" class="alert-img" />
+                            <h2 class="mb-1 text-danger fs-3">Are you sure!</h2>
+                            <p>You want to logout.</p>
+                            <div class="d-flex gap-2 justify-content-center mt-4">
+                                <button class="btn btn-mcolor btn-sm">Yes</button>
+                                <button class="btn btn-outline btn-sm" data-bs-dismiss="modal" aria-label="Close">No</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- SignIn form Details  END -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Logout popup END -->
+
+
+</body>
+<!-- script -->
+<script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'assets/js/jquery.min.js' %}"></script>
+<script src="{% static 'assets/js/script.js' %}"></script>
+
+{% block script %}{% endblock %}
+</html> 
