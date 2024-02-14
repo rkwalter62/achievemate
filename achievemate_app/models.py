@@ -3,7 +3,7 @@ from django.db import models
 # Create your models here.
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.contrib.auth.hashers import make_password,check_password
-
+from django.utils import timezone
 
 # Create your models here.
 class BaseModel(models.Model):
@@ -11,7 +11,7 @@ class BaseModel(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
     is_deleted = models.BooleanField(default=False)
-    is_testdata = models.SmallIntegerField(default=1,choices=TEST_DATA_CHOICES,blank=True, null=True)
+    is_testdata = models.CharField(max_length=1,default='1',choices=TEST_DATA_CHOICES,blank=True, null=True)
 
     def soft_delete(self):
         self.is_deleted = True

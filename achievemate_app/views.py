@@ -179,7 +179,7 @@ def send_message(request):
     
 def get_messages(request):
     # Retrieve messages from the Chat model
-    messages = Chat.objects.filter(is_delete=0).order_by('created_date')
+    messages = Chat.objects.filter(is_deleted=0).order_by('created_date')
     print(messages)
     message_texts = [message.chat_text for message in messages]
 
