@@ -261,9 +261,9 @@
                                         <!-- Password -->
                                         <div class="form-group">
                                             <label class="form-label">Password</label>
-                                            <input type="text" name="password" id="login_password" value="" placeholder="Password"
+                                            <input type="password" name="password" id="login_password" value="" placeholder="Password"
                                                 class="form-control" required="">
-                                            <span class="input-icon"><i class="ri-eye-line"></i></span>
+                                            <span class="input-icon toggle-password" data-target="#login_password"><i class="ri-eye-line"></i></span>
                                         </div>
                                     </div>
                                     <div class="col-12">
@@ -351,9 +351,9 @@
                                         <!-- Password -->
                                         <div class="form-group">
                                             <label class="form-label">Password</label>
-                                            <input type="text" name="password" value="" id="signup_password" placeholder="Password"
-                                                class="form-control" required="">
-                                            <span class="input-icon"><i class="ri-eye-line"></i></span>
+                                            <input type="password" name="password" value="" id="signup_password" placeholder="Password"
+                                                class="form-control " required="">
+                                            <span class="input-icon toggle-password" data-target="#signup_password"><i class="ri-eye-line"></i></span>
                                         </div>
                                     </div>
                                     <div class="col-12">
@@ -542,6 +542,27 @@
                 // Reload the page
                 location.reload();
             });
+            // Function to toggle password visibility
+            function togglePassword(target) {
+                const input = $(target);
+                const icon = input.next('.input-icon');
+        
+                if (input.attr('type') === 'password') {
+                    input.attr('type', 'text');
+                    //icon.html('<img src="{% static 'assets/img/icon/eye-slash.svg' %}" alt="Hide Password" />');
+                } else {
+                    input.attr('type', 'password');
+                    //icon.html('<img src="{% static 'assets/img/icon/eye.svg' %}" alt="Show Password" />');
+                }
+            }
+        
+            // Attach click event to all elements with class 'toggle-password'
+            $('.toggle-password').click(function() {
+                const target = $(this).data('target');
+                togglePassword(target);
+            });
         });
+
+
   </script>
 </html>

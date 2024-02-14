@@ -3,7 +3,8 @@
 Hi {{ user.username }},
 
 Please click the link below to activate your account:
-{{ domain }}{% url 'activate_account' uidb64=uid token=token %}
+{% comment %} {{ domain }}{% url 'activate_account' uidb64=uid token=token %} {% endcomment %}
+http://3.220.247.187{% url 'activate_account' uidb64=uid token=token %}
 
 Thanks,
 The AchieveMate Team
