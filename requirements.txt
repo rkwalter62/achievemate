@@ -15,7 +15,8 @@ django-allauth==0.60.1
 hyperlink==21.0.0
 idna==3.6
 incremental==22.10.0
-mysqlclient==2.2.3
+# mysqlclient==2.2.3
+pymysql==1.1.0
 oauthlib==3.2.2
 pyasn1==0.5.1
 pyasn1-modules==0.3.0
