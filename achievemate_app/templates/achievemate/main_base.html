@@ -115,6 +115,12 @@
                                 <li class="nav-item">
                                     <a class="nav-link" href="{% url 'subscription'%}">Subscription </a>
                                 </li>
+                                {% if user.is_authenticated %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'dashbaord'%}">Dashboard </a>
+                                </li>
+
+                                {% endif %}
                             </ul>
                         </div>
                     </div>
@@ -218,6 +224,62 @@
     </div>
     <!-- main-page END  -->
 
+    <!-- Modal Forgot Password -->
+    <div class="modal cstm-modal fade" id="ForgotPassword" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><i
+                        class="ri-close-line"></i></button>
+                <div class="modal-body">
+                    <!-- SignIn form Details  Start -->
+                    <div class="auth-wrapper">
+                        <h2>Welcome back to the <strong>AchieveMate</strong> Community</h2>
+                        <div class="auth-form">
+                            <!-- auth-form Start -->
+                            <form >
+                                {% csrf_token %}
+                                <div class="row g-4">
+                                    <div class="col-12">
+                                        <div class="d-flex form-group gap-3 justify-content-center mb-0 mb-sm-3">
+                                                <span class="auth-icon-btn-text">We will send you an email with a temporary password , For Better Security Please Change it from profile. </span>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <!-- Email -->
+                                        <div class="form-group">
+                                            <label class="form-label">Email or Username</label>
+                                            <input type="text" name="email" id="forogot_password_username" value="" placeholder="Enter Your Email"
+                                                class="form-control" required="">
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="row align-items-center">
+                                            <div class="col-6">
+                                                <!-- Button  -->
+                                                <button id="reset_password_button"
+                                                    class="btn btn-mcolor w-100 rounded-pill text-uppercase">Reset Password</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="text-center">
+                                            <span class="mt-3 mb-0 text-black">No Account yet? <strong><a href=""
+                                                        data-bs-toggle="modal" data-bs-target="#UserSignUp"><u>SIGN
+                                                            UP</u></a></strong>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                            <!-- auth-form END -->
+                        </div>
+                    </div>
+                    <!-- SignIn form Details  END -->
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Modal Login -->
     <div class="modal cstm-modal fade" id="UserLogin" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -231,7 +293,7 @@
                         <h2>Welcome back to the <strong>AchieveMate</strong> Community</h2>
                         <div class="auth-form">
                             <!-- auth-form Start -->
-                            <form >
+                            <form method="post">
                                 {% csrf_token %}
                             
                                 <div class="row g-4">
@@ -276,7 +338,7 @@
                                             </div>
                                             <div class="col-6">
                                                 <!-- Button  -->
-                                                <button id="login_button"
+                                                <button type="submit" id="login_button"
                                                     class="btn btn-mcolor w-100 rounded-pill text-uppercase">Log
                                                     in</button>
                                             </div>
@@ -287,6 +349,12 @@
                                             <span class="mt-3 mb-0 text-black">No Account yet? <strong><a href=""
                                                         data-bs-toggle="modal" data-bs-target="#UserSignUp"><u>SIGN
                                                             UP</u></a></strong></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="text-center">
+                                            <span class="mt-3 mb-0 text-black">Forgot Password? <strong><a href="#"
+                                                        data-bs-toggle="modal" data-bs-target="#ForgotPassword"><u>Click here</u></a></strong></span>
                                         </div>
                                     </div>
                                 </div>
@@ -502,7 +570,36 @@
           });
         });
 
-
+        $("#reset_password_button").click(function (event) {
+            event.preventDefault();  // Prevent the default link behavior
+            var username = $('#forogot_password_username').val();
+            let csr = $("input[name=csrfmiddlewaretoken]").val();
+            // Construct data object
+            var formData = {
+                'username': username,
+                'csrfmiddlewaretoken': csr
+            };
+            $.ajax({
+              method: "POST",
+              url: "{% url 'forgot_password' %}",  
+              data: formData,
+              success: function (response) {
+                console.log(response)
+                $('#forogot_password_username').val('');
+                $('#reset_password_button').modal('hide');
+                if (response.success) {
+                    alert(response.message)
+                    location.reload()
+                } else {
+                    // Handle signup error
+                    alert(response.message)
+                }
+              },
+              error: function (error) {
+                console.log("error:", error);
+              }
+            });
+        });
 
 
         $(document).ready(function() {
@@ -563,6 +660,22 @@
             });
         });
 
-
+        $(document).on('keyup', function(event) {
+            console.log("Key pressed: " + event.which);
+            if (event.which === 13) {
+                console.log("Enter key pressed");
+                // Determine which modal is open
+                var activeModal = $('.modal.show')[0].id;
+                
+                // Check which modal is active and click the respective button
+                if (activeModal === "UserLogin") {
+                    $('#login_button').click();
+                } else if (activeModal === "UserSignUp") {
+                    $('#signup_button').click();
+                } else if (activeModal === "ForgotPassword") {
+                    $('#reset_password_button').click();
+                }
+            }
+        });
   </script>
 </html>

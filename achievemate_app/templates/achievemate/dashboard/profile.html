@@ -63,7 +63,8 @@
                 <div class="col-12">
                     <div class="row">
                         <div class="col-xxl-10">
-                            <form class="edit-profile-form w-100">
+                            <form class="edit-profile-form w-100" id="profile-form" method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
                                 <div class="row">
                                     <div class="col-12">
                                         <!-- profile-header -->
@@ -72,11 +73,11 @@
                                             <div class="profile">
                                                 <!-- profile-img -->
                                                 <div class="profile-img">
-                                                    <img src="{% static 'assets/img/profile.png' %}" alt="img/profile" />
+                                                    <img src="{{user_profile_data.profilepic.url}}" alt="img/profile" />
                                                 </div>
                                                 <div class="profile-content">
                                                     <!-- p_name -->
-                                                    <h4 class="p_name">johnda Dev</h4>
+                                                    <h4 class="p_name">{{request.user.username}}</h4>
                                                     <!-- p_designation -->
                                                     <span class="p_designation">Product Design</span>
                                                     <!-- p_location -->
@@ -89,11 +90,11 @@
                                                 <div class="cstm-profile-upload">
                                                     <div class="upload-btn-wrapper">
                                                         <button class="btn btn-scolor">Upload New Photo </button>
-                                                        <input type="file" name="myfile">
+                                                        <input type="file" name="profilepic" id="profilepic">
                                                     </div>
                                                 </div>
                                                 <!-- Delete btn  -->
-                                                <button class="btn btn-outline">Delete</button>
+                                                <button class="btn btn-outline" id="deleteBtn">Delete</button>
                                             </div>
                                         </div>
                                     </div>
@@ -103,21 +104,21 @@
                                     <div class="col-lg-6 col-xl-4 col-md-6">
                                         <div class="form-group">
                                             <label class="form-label">First Name</label>
-                                            <input type="text" name="" value="johndoe" placeholder="" class="form-control" />
+                                            <input type="text" name="firstname" value="{% if user_profile_data.firstname %}{{ user_profile_data.firstname }} {% endif %}" placeholder="Enter Firstname" class="form-control" />
                                         </div>
                                     </div>
                                     <!-- Last Name -->
                                     <div class="col-lg-6 col-xl-4 col-md-6">
                                         <div class="form-group">
                                             <label class="form-label">Last Name</label>
-                                            <input type="text" name="" value="Dev" placeholder="" class="form-control" />
+                                            <input type="text" name="lastname" value="{% if user_profile_data.lastname %}{{user_profile_data.lastname}}{% endif %}" placeholder="Enter Lastname" class="form-control" />
                                         </div>
                                     </div>
                                     <!-- Email Address -->
                                     <div class="col-lg-6 col-xl-4 col-md-6">
                                         <div class="form-group with-label with-icon icon-start">
                                             <label class="form-label">Email Address</label>
-                                            <input type="text" name="" value="" placeholder="" class="form-control" />
+                                            <input type="text" name="" value="{{request.user.email}}" placeholder="" class="form-control" />
                                             <span class="input-icon"><i class="ri-mail-fill"></i></span>
                                         </div>
                                     </div>
@@ -133,7 +134,7 @@
                                     <div class="col-lg-6 col-xl-4 col-md-6">
                                         <div class="form-group with-label with-icon icon-start">
                                             <label class="form-label">Current Password</label>
-                                            <input type="text" name="" value="" placeholder="" class="form-control" />
+                                            <input type="password" name="current_password" value="" placeholder="" class="form-control" />
                                             <span class="input-icon"><i class="ri-key-fill"></i></span>
                                         </div>
                                     </div>
@@ -141,7 +142,7 @@
                                     <div class="col-lg-6 col-xl-4 col-md-6">
                                         <div class="form-group with-label with-icon icon-start">
                                             <label class="form-label">New Password</label>
-                                            <input type="text" name="" value="" placeholder="" class="form-control" />
+                                            <input type="password" name="new_password" value="" placeholder="" class="form-control" />
                                             <span class="input-icon"><i class="ri-key-fill"></i></span>
                                         </div>
                                     </div>
@@ -149,7 +150,7 @@
                                     <div class="col-lg-6 col-xl-4 col-md-6">
                                         <div class="form-group with-label with-icon icon-start">
                                             <label class="form-label">Confirm New Password</label>
-                                            <input type="text" name="" value="" placeholder="" class="form-control" />
+                                            <input type="password" name="confirm_new_password" value="" placeholder="" class="form-control" />
                                             <span class="input-icon"><i class="ri-key-fill"></i></span>
                                         </div>
                                     </div>
@@ -157,8 +158,8 @@
                                 <div class="row g-4 mt-2">
                                     <div class="col-12">
                                         <div class="d-flex gap-3 justify-content-xl-end justify-content-center">
-                                            <button class="btn btn-outline">Cancel</button>
-                                            <button class="btn btn-scolor">Save Changes</button>
+                                            <button type="reset" class="btn btn-outline">Cancel</button>
+                                            <button id="save-profile-btn" class="btn btn-scolor">Save Changes</button>
                                         </div>
                                     </div>
                                 </div>
@@ -171,4 +172,70 @@
         <!-- main-content END -->
     </section>
     <!-- page-layout END -->
-{% endblock %}
+    {% endblock %}
+    {% block script %}
+    {% comment %} <script>
+        $('#save-profile-btn').click(function(e) {
+            e.preventDefault();
+            var form_data = new FormData($('#profile-form')[0]);
+            form_data.append('csrfmiddlewaretoken', $('#csrfmiddlewaretoken').val());
+            console.log(form_data)
+            $.ajax({
+                method: 'POST',
+                url: '{% url "profile" %}',  // Replace 'profile' with your actual URL name
+                data: form_data,
+                processData: false,  // Prevent jQuery from automatically processing the data
+                contentType: false,
+                success: function(response) {
+                   if(response.success)
+                   {
+                    alert(response.message)
+                   }
+                },
+                error: function(xhr, status, error) {
+                    alert(error)
+                }
+            });
+        });
+    </script> {% endcomment %}
+<script>
+    $(document).ready(function () {
+        $('#save-profile-btn').click(function (e) {
+            e.preventDefault();
+
+            var formData = new FormData($('#profile-form')[0]);
+
+            // Append CSRF token to form data
+            formData.append('csrfmiddlewaretoken', $('input[name=csrfmiddlewaretoken]').val());
+
+            $.ajax({
+                url: '{% url "profile" %}', // Replace this with the URL to your Django view for updating the profile
+                type: 'POST',
+                enctype: 'multipart/form-data',
+                processData: false,
+                contentType: false,
+                data: formData,
+                success: function (data) {
+                    // Handle success response
+                    if(data.success)
+                    {
+                    alert(data.message);
+                    location.reload()
+                    }
+                },
+                error: function (xhr, status, error) {
+                    // Handle error response
+                    console.error('Error updating profile:', error);
+                }
+            });
+        });
+        $("#deleteBtn").click(function(e) {
+            e.preventDefault();
+            $("#profilepic").val("");
+        });
+    });
+
+
+</script>
+
+    {% endblock %}

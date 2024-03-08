@@ -23,29 +23,28 @@ class BaseModel(models.Model):
 
     class Meta:
         abstract = True
-
-class Subscription(BaseModel):
-    PACKAGE_TYPE_CHOICES = [
-        ('yearly', 'yearly'),
-        ('monthly ', 'monthly'),
-    ]
+class SubscriptionPackage(BaseModel):
     package_name = models.CharField(max_length=255, blank=True, null=True)
-    package_cost = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    package_type = models.CharField(max_length=10,choices=PACKAGE_TYPE_CHOICES, blank=True, null=True)
 
     class Meta:
-        managed =True
-        db_table = 'subscription'
-
-
+        managed = True
+        db_table = 'subscription_package'
 class SubscriptionFeatures(BaseModel):
-    subscription = models.ForeignKey(Subscription, models.CASCADE, blank=True, null=True)
+    subscription_package = models.ForeignKey(SubscriptionPackage, models.CASCADE, blank=True, null=True)
     feature_name = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         managed =True
         db_table = 'subscription_features'
- 
+class Subscription(BaseModel):
+    subscription_package = models.ForeignKey(SubscriptionPackage, models.DO_NOTHING, blank=True, null=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    duration = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        managed =True
+        db_table = 'subscription'
+
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, username, password=None, **extra_fields):
         if not email:
@@ -76,8 +75,8 @@ class Users(BaseModel,AbstractBaseUser, PermissionsMixin):
     role = models.CharField(max_length=255, choices=[('coach', 'coach'), ('user', 'user')], default='user')
     user_type = models.CharField(max_length=255, choices=[('standard', 'standard'), ('google', 'google')], default='standard')
     google_id = models.CharField(max_length=255, blank=True, null=True)
-    subscription_package =  models.ForeignKey('Subscription', models.DO_NOTHING, blank=True, null=True)
-    subscription_status = models.CharField(max_length=255, choices=[('active', 'active'), ('inactive', 'inactive')], default='active')
+    subscription_package =  models.ForeignKey(Subscription, models.DO_NOTHING, blank=True, null=True)
+    subscription_status = models.CharField(max_length=255, choices=[('active', 'active'), ('inactive', 'inactive')], default='inactive')
     subscription_expiry = models.DateField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -108,6 +107,16 @@ class Users(BaseModel,AbstractBaseUser, PermissionsMixin):
     class Meta:
         managed = True
         db_table = 'users'
+
+class UserProfile(BaseModel):
+    firstname = models.CharField(max_length=255, blank=True, null=True)
+    lastname = models.CharField(max_length=255, blank=True, null=True)
+    profilepic = models.FileField(upload_to='user_profile_pic/',blank=True, null=True,default='user_profile_pic/anonymous.png')
+    user = models.ForeignKey('Users', models.DO_NOTHING, blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'user_profile'
 
 
 class AiCoach(BaseModel):
@@ -140,16 +149,6 @@ class Chat(BaseModel):
     class Meta:
         managed = True
         db_table = 'chat'
-
-class UserProfile(BaseModel):
-    firstname = models.CharField(max_length=255, blank=True, null=True)
-    lastname = models.CharField(max_length=255, blank=True, null=True)
-    profilepic = models.FileField(upload_to='user_profile_pic/',blank=True, null=True)
-    user = models.ForeignKey('Users', models.DO_NOTHING, blank=True, null=True)
-
-    class Meta:
-        managed = True
-        db_table = 'user_profile'
 
 
 

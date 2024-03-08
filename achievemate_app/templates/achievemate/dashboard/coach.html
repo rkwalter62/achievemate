@@ -261,14 +261,14 @@
                                                     </div>
                                                     <!-- coach-info-footer -->
                                                     <div class="coach-info-footer">
-                                                        <a href="chat.html" class="btn start-session-btn">Start Session</a>
+                                                        <a href="{% url 'chat' request.user.id single_coach.id  %}" class="btn start-session-btn">Start Session</a>
                                                     </div>
                                                 </div>
                                             </a>
                                         </div>
                                         {% endfor %}
                                         <!-- Loop END  -->
-                                        <div class="col">
+                                        {% comment %} <div class="col">
                                             <a href="coach_details.html" class="single-coach-wrap">
                                                 <!-- coach-info-card -->
                                                 <div class="coach-info-card">
@@ -477,7 +477,7 @@
                                                     </div>
                                                 </div>
                                             </a>
-                                        </div>
+                                        </div> {% endcomment %}
                                     </div>
                                 </div>
                             </div>

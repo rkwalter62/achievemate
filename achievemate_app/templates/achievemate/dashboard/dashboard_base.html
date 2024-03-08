@@ -49,7 +49,7 @@
                                 </a>
                             </li>
                             <!-- Coach  -->
-                            <li class="nav-link active">
+                            <li class="nav-link">
                                 <a href="{% url 'coach' %}">
                                     <span class="nav-link-icon">
                                         <img src="{% static 'assets/img/icon/svg/sidebar/coach.svg' %}"
@@ -60,7 +60,7 @@
                             </li>
                             <!-- Chat  -->
                             <li class="nav-link">
-                                <a href="{% url 'chat' %}">
+                                <a href="{% url 'chat_page' %}">
                                     <span class="nav-link-icon">
                                         <img src="{% static 'assets/img/icon/svg/sidebar/chat.svg' %}" alt="icon/svg/sidebar/chat">
                                     </span>
@@ -130,7 +130,9 @@
                             <h2 class="mb-1 text-danger fs-3">Are you sure!</h2>
                             <p>You want to logout.</p>
                             <div class="d-flex gap-2 justify-content-center mt-4">
-                                <button class="btn btn-mcolor btn-sm">Yes</button>
+                                {% if user.is_authenticated %}
+                                {% endif %}
+                                <button class="btn btn-mcolor btn-sm" id="confirm_logout">Yes</button>
                                 <button class="btn btn-outline btn-sm" data-bs-dismiss="modal" aria-label="Close">No</button>
                             </div>
                         </div>
@@ -149,5 +151,30 @@
 <script src="{% static 'assets/js/jquery.min.js' %}"></script>
 <script src="{% static 'assets/js/script.js' %}"></script>
 
-{% block script %}{% endblock %}
+<script>
+        $("#confirm_logout").click(function() {
+            // Redirect to the logout URL
+            window.location.href = "{% url 'logout' %}";
+        });
+        function setActiveNavItem() {
+            // Get the current URL path
+            var currentPath = window.location.pathname;
+
+            // Loop through each navigation item
+            $('.nav-link').each(function() {
+                var href = $(this).find('a').attr('href');
+
+                // Check if the current URL matches the href of the navigation item
+                if (currentPath === href) {
+                    $(this).addClass('active');
+                }
+            });
+        }
+
+        // Set active class initially
+        setActiveNavItem();
+
+    </script>
+{% block script %}
+{% endblock %}
 </html> 

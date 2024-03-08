@@ -40,7 +40,7 @@
                             </nav>
                             <!-- page-title -->
                             <div class="page-title">
-                                <h2><a href="coach.html"><i class="ri-arrow-left-line"></i></a> Chat</h2>
+                                <h2><a href="{% url 'dashbaord' %}"><i class="ri-arrow-left-line"></i></a> Chat</h2>
                             </div>
                         </div>
                     </div>
@@ -72,47 +72,23 @@
                                             <!-- chat-sender-list Start -->
                                             <div class="chat-sender-list">
                                                 <ul>
+                                                    {% for coach in coaches_data %}
                                                     <!-- Loop Start  -->
-                                                    <li class="view-chat"><!-- add view-chat class on click  -->
+                                                    <li class="view-chat" data-coach-id="{{ coach.id }}"><!-- add view-chat class on click  -->
                                                         <div class="chat-sender">
                                                             <!-- sender-img -->
                                                             <div class="sender-img">
-                                                                <img src="{% static 'assets/img/chat-user.svg' %}" alt="">
+                                                                <img src="{{coach.coach_profile_image.url}}" alt="">
                                                             </div>
                                                             <div class="sender-massage">
                                                                 <!-- sender-name  -->
-                                                                <h5 class="sender-name">Jonathan Munro</h5>
-                                                                <p class="sender-text">Customized Diet and Exercise Plans</p>
+                                                                <h5 class="sender-name">{{coach.coach_name}}</h5>
+                                                                <p class="sender-text">{{coach.coach_expertise}}</p>
                                                             </div>
                                                         </div>
                                                     </li>
                                                     <!-- Loop END  -->
-                                                    <li class="">
-                                                        <div class="chat-sender">
-                                                            <!-- sender-img -->
-                                                            <div class="sender-img">
-                                                                <img src="{% static 'assets/img/chat-user.svg' %}" alt="">
-                                                            </div>
-                                                            <div class="sender-massage">
-                                                                <!-- sender-name  -->
-                                                                <h5 class="sender-name">Jonathan Munro</h5>
-                                                                <p class="sender-text">Customized Diet and Exercise Plans</p>
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                    <li class="">
-                                                        <div class="chat-sender">
-                                                            <!-- sender-img -->
-                                                            <div class="sender-img">
-                                                                <img src="{% static 'assets/img/chat-user.svg' %}" alt="">
-                                                            </div>
-                                                            <div class="sender-massage">
-                                                                <!-- sender-name  -->
-                                                                <h5 class="sender-name">Jonathan Munro</h5>
-                                                                <p class="sender-text">Customized Diet and Exercise Plans</p>
-                                                            </div>
-                                                        </div>
-                                                    </li>
+                                                    {% endfor %}
                                                 </ul>
                                             </div>
                                             <!-- chat-sender-list END -->
@@ -134,7 +110,7 @@
                                         <!-- usertalk-wrapper Start -->
                                         <div class="usertalk-wrapper" id="messages">
                                             <!-- owner msg  -->
-                                            <div class="usertalk-inner">
+                                            {% comment %} <div class="usertalk-inner">
                                                 <div class="chatuser-img">
                                                     <img src="{% static 'assets/img/chat-user.svg' %}" class="img-responsive">
                                                 </div>
@@ -167,7 +143,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="usertalk-inner">
+                                            <div class="usertalk-inner" id="typing-indicator">
                                                 <div class="chatuser-img">
                                                     <img src="{% static 'assets/img/chat-user.svg' %}" class="img-responsive">
                                                 </div>
@@ -185,7 +161,7 @@
                                                         <button class="btn-scolor"><i class="ri-add-line"></i>Add to task</button>
                                                     </div>
                                                 </div>
-                                            </div>
+                                            </div> {% endcomment %}
                                         </div>
                                         <!-- usertalk-wrapper END -->
 
@@ -225,9 +201,16 @@
     {% endblock %}
     {% block script %}
     <script>
+
+        {% comment %} function scrollToBottom() {
+            var chatWindow = document.getElementByClass('chat-wrapper');
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        } {% endcomment %}
         // WebSocket connection
-        const uid ="{{uid}}";
-        const cid ="{{cid}}";
+        {% comment %} const uid ="{{uid}}";
+        const cid ="{{cid}}"; {% endcomment %}
+        const uid = "{{uid}}" ? "{{uid}}" : 0;
+        const cid = "{{cid}}" ? "{{cid}}" : 0;
         {% comment %} console.log(uid,cid); {% endcomment %}
         const roomName = `room_${uid}_${cid}`;
         const socket = new WebSocket(`ws://localhost:8000/ws/chat/${roomName}/`);
@@ -239,48 +222,62 @@
 
         socket.onmessage = function(event) {
             const message = JSON.parse(event.data).message;
-            $('#messages').append(`<div>${message}</div>`);
+            //$('#messages').append(`<div>${message}</div>`);
+            updateMessages();
+            //scrollToBottom();
         };
-
-          {% comment %} // Function to update messages
-          function updateMessages() {
-                $.ajax({
-                    url: "{% url 'get_messages' %}",
-                    type: 'GET',
-                    success: function(data) {
-                        $('#messages').html(data);
-                    }
-                });
-            }; {% endcomment %}
+            
             function updateMessages() {
                 $.ajax({
-                    url: "{% url 'get_messages' %}",
+                    url: `{% url 'get_messages' %}?uid=${parseInt(uid)}&cid=${parseInt(cid)}`,
                     type: 'GET',
                     success: function(data) {
                         console.log(data)
                         var messages = data.messages;
+                        console.log(data.serialized_messages)
                         // Assuming data is an array of chat objects
                         $('#messages').empty(); // Clear previous messages
+                        
                         messages.forEach(function(chat) {
-                            // Construct the HTML for each chat message
-                            var messageHtml = `
-                                <div class="usertalk-inner">
-                                    <div class="chatuser-img">
-                                        <img src="{% static 'assets/img/chat-user.svg' %}" class="img-responsive">
-                                    </div>
-                                    <div class="userleft-msg">
-                                        <span>${chat}</span>
-                                        <div class="msg-dt">
-                                            <label>just now</label>
-                                            <div class="action-button-list">
-                                                <button class="btn-scolor"><i class="ri-add-line"></i>Add to task</button>
-                                            </div>
-                                        </div>
+                            var messageHtml;
+                            console.log("chat: ",chat)
+                if (chat[1] == "user") {
+                    messageHtml = `
+                        <div class="usertalk-inner">
+                            <div class="chatuser-img">
+                                <img src="{% static 'assets/img/chat-user.svg' %}" class="img-responsive">
+                            </div>
+                            <div class="userleft-msg">
+                                <span>${chat[0]}</span>
+                                <div class="msg-dt">
+                                    <label>just now</label>
+                                    <div class="action-button-list">
+                                        <button class="btn-scolor"><i class="ri-add-line"></i>Add to task</button>
                                     </div>
                                 </div>
-                            `;
-                            // Append the message to the messages container
-                            $('#messages').append(messageHtml);
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    messageHtml = `
+                        <div class="usertalk-inner reply-inner" >
+                            <div class="chatuser-img">
+                                <img src="{% static 'assets/img/chat-user.svg' %}" class="img-responsive">
+                            </div>
+                            <div class="userleft-msg">
+                                <span>${chat[0]}</span>
+                                <div class="msg-dt">
+                                    <label>just now</label>
+                                    <div class="action-button-list">
+                                        <button class="btn-scolor"><i class="ri-add-line"></i>Add to task</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                // Append the message to the messages container
+                $('#messages').append(messageHtml);
                         });
                     }
                 });
@@ -288,13 +285,36 @@
             
         // Update messages when the page loads
         $(document).ready(function() {
-            updateMessages();
+                updateMessages();
+                //scrollToBottom();
         });
-
+        const typingreplyIndicatorHTML = `
+            <div class="usertalk-inner reply-inner">
+                <div class="chatuser-img">
+                    <img src="{% static 'assets/img/chat-user.svg' %}" class="img-responsive">
+                </div>
+                <div class="userleft-msg">
+                    <!-- typing -->
+                    <span>
+                        <div class="typing">
+                            <span class="circle"></span>
+                            <span class="circle"></span>
+                            <span class="circle"></span>
+                        </div>
+                    </span>
+                    <!-- puase btn  -->
+                    <div class="msg-dt">
+                        <button class="btn-scolor"><i class="ri-add-line"></i>Add to task</button>
+                    </div>
+                </div>
+            </div>
+        `;
         // Event listener for send button
         $(document).ready(function() {
+            //scrollToBottom();
         const csr = $("input[name=csrfmiddlewaretoken]").val();
         $('#send-btn').click(function() {
+            $('#messages').append(typingreplyIndicatorHTML);
             const message = $('#message-input').val().trim();
             console.log(message)
             var formData ={
@@ -309,22 +329,93 @@
                     url: "{% url 'send_message' %}",
                     method: 'POST',
                     data: formData,
+                    //$('#messages').append(typingreplyIndicatorHTML),
                     success: function(response) {
                         socket.send(JSON.stringify({'message': message}));
                         $('#message-input').val('');
                         updateMessages();
-                        alert(response.status)
+                        //scrollToBottom();
+                        //alert(response.status)
                     }
                 });
             }
         });
-    });
-        // Handle Enter key press
-        $('#message-input').keypress(function(event) {
-            if (event.which === 13) {
-                $('#send-btn').click();
+        const typingIndicatorHTML = `
+            <div class="usertalk-inner" id="typing-indicator">
+                <div class="chatuser-img">
+                    <img src="{% static 'assets/img/chat-user.svg' %}" class="img-responsive">
+                </div>
+                <div class="userleft-msg">
+                    <!-- typing -->
+                    <span>
+                        <div class="typing">
+                            <span class="circle"></span>
+                            <span class="circle"></span>
+                            <span class="circle"></span>
+                        </div>
+                    </span>
+                    <!-- puase btn  -->
+                    <div class="msg-dt">
+                        <button class="btn-scolor"><i class="ri-add-line"></i>Add to task</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        let typingIndicatorDisplayed = false;
+        // Event listener for keyup event on input field
+        $('#message-input').on('keyup', function() {
+            // Check if the input field is empty
+            if ($(this).val().trim() === '') {
+                // If empty, remove the typing indicator
+                $('#typing-indicator').remove();
+                // Reset the flag
+                typingIndicatorDisplayed = false;
+            } else {
+                // If not empty and typing indicator is not already displayed
+                if (!typingIndicatorDisplayed) {
+                    // Append the typing indicator HTML
+                    $('#messages').append(typingIndicatorHTML);
+                    // Set the flag to true
+                    typingIndicatorDisplayed = true;
+                }
             }
+        }); 
+    });
+    // Handle Enter key press
+    $('#message-input').keypress(function(event) {
+        if (event.which === 13) {
+            $('#send-btn').click();
+        }
+    });
+    
+
+    $('.view-chat').on('click', function() {
+        // Get the coach ID from the data attribute
+        var coachId = $(this).data('coach-id');
+        var userId = {{ request.user.id }}; // This syntax is correct assuming you're rendering this script in a Django template
+        
+        // Generate the URL using JavaScript string formatting
+        var chatUrl = "{% url 'chat' 0 0 %}";
+        chatUrl = chatUrl.replace("0", userId).replace("0", coachId);
+        
+        // Redirect to the chat URL
+        window.location.href = chatUrl;
+    });
+
+    if ($('.chat-sender-list ul').children().length === 0) {
+        // If ul is empty, create a new li element with the message
+        var messageLi = $('<li >').html('😔 There are no chats available at the moment.<br> <br> 💬✨ Please chat with our experts and get your doubts cleared. 🤔🔍');
+        messageLi.click(function() {
+            window.location.href='{% url "coach" %}'; // Replace 'your_coach_url_here' with the actual URL
         });
+        // Append the new li element to the ul
+        $('.chat-sender-list ul').append(messageLi);
+    }
+    {% comment %} else {
+        // If ul is not empty, click on the first li element
+        $('.chat-sender-list ul li:first').click(); 
+    } {% endcomment %}
     </script>
 
     {% endblock %}

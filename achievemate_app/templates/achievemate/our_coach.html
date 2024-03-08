@@ -29,34 +29,32 @@
             <div class="container">
                 <div class="row row-cols-xl-4 row-cols-lg-3 row-cols-md-2 row-cols-sm-2 row-cols-1 g-xl-5 g-3 mt-0">
                     <!-- Loop start  -->
+                    {% for single_coach in all_coach_details %}
                     <div class="col">
                         <!-- img-wrapper -->
                         <div class="img-wrapper">
                             <!-- img-thumbnail -->
                             <div class="img-thumbnail">
-                                <img src="{% static 'assets/img/coach/coach-01.jpg' %}" alt="coach/coach-01" />
+                                <img src="{{single_coach.coach_profile_image.url}}" alt="coach/coach-01" />
                             </div>
                             <!-- img-content -->
                             <div class="img-content">
                                 <div class="img-content-head">
                                     <!-- title -->
-                                    <h4 class="title">Jacob Jones</h4>
+                                    <h4 class="title">{{single_coach.coach_name}}</h4>
                                     <!-- designation -->
-                                    <span class="designation"> Life Coaching Experts</span>
+                                    <span class="designation"> {{single_coach.coach_expertise}}</span>
                                 </div>
                                 <!-- desc -->
                                 <p class="desc">
-                                    Navigate the world of finance with confidence under the guidance of Coach Jones.
-                                    With a rich background in financial planning and a knack for making complex concepts
-                                    easy to understand, Jones is your go-to expert foExpertsr all things money-related.
-                                    From budgeting to investing, Jones offers practical, tailored advice to help you
-                                    make informed financial decisions.
+                                    {{single_coach.coach_about}}
                                 </p>
                             </div>
                         </div>
                     </div>
+                    {% endfor %}
                     <!-- Loop END  -->
-                    <div class="col">
+                    {% comment %} <div class="col">
                         <!-- img-wrapper -->
                         <div class="img-wrapper">
                             <!-- img-thumbnail -->
@@ -231,7 +229,7 @@
                                 </p>
                             </div>
                         </div>
-                    </div>
+                    </div> {% endcomment %}
                 </div>
             </div>
         </section>
