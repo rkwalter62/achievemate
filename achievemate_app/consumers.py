@@ -2,7 +2,7 @@
 
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
-from achievemate_app.models import Chat,AiCoach
+
 from asgiref.sync import sync_to_async
 import re
 import requests
@@ -67,6 +67,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @sync_to_async
     def save_chat_message(self, message):
+        from achievemate_app.models import Chat
         # Save the chat message to the database
         Chat.objects.create(
             chat_text=message,
@@ -76,6 +77,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
     @sync_to_async
     def getting_repsonse_by_api(self,coach_id,query):
+        from achievemate_app.models import AiCoach
         # Save the chat message to the database
         print("Inside API CALLING",coach_id,query)
         current_coach=AiCoach.objects.get(id=coach_id)
