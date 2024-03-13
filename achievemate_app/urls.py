@@ -26,6 +26,7 @@ urlpatterns = [
     path('progress_tracking/', views.progress_tracking, name='progress_tracking'),
     path('get_messages/', views.get_messages, name='get_messages'),
     path('send_message/', views.send_message, name='send_message'),
+    path('get_task/', views.get_task, name='get_task'),
 
 
 

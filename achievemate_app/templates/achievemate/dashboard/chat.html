@@ -74,7 +74,7 @@
                                                 <ul>
                                                     {% for coach in coaches_data %}
                                                     <!-- Loop Start  -->
-                                                    <li class="view-chat" data-coach-id="{{ coach.id }}"><!-- add view-chat class on click  -->
+                                                    <li class="view-chat {% if forloop.first %}first-item{% endif %}" data-coach-id="{{ coach.id }}"><!-- add view-chat class on click  -->
                                                         <div class="chat-sender">
                                                             <!-- sender-img -->
                                                             <div class="sender-img">
@@ -87,11 +87,13 @@
                                                             </div>
                                                         </div>
                                                     </li>
+                                                  
                                                     <!-- Loop END  -->
                                                     {% endfor %}
                                                 </ul>
                                             </div>
                                             <!-- chat-sender-list END -->
+                                            
                                         </div>
                                     </div>
                                 </div>
@@ -213,7 +215,14 @@
         const cid = "{{cid}}" ? "{{cid}}" : 0;
         {% comment %} console.log(uid,cid); {% endcomment %}
         const roomName = `room_${uid}_${cid}`;
-        const socket = new WebSocket(`ws://localhost:8000/ws/chat/${roomName}/`);
+        //const socket = new WebSocket(`ws://localhost:8000/ws/chat/${roomName}/`);
+        const socket = new WebSocket(
+            'ws://' +
+            window.location.host +
+            '/ws/chat/' +
+            roomName +
+            '/'
+        );
         console.log(socket)
         // Event listeners
         socket.onopen = function(event) {
@@ -232,44 +241,41 @@
                     url: `{% url 'get_messages' %}?uid=${parseInt(uid)}&cid=${parseInt(cid)}`,
                     type: 'GET',
                     success: function(data) {
-                        console.log(data)
+                        console.log("update message data -> ",data)
                         var messages = data.messages;
-                        console.log(data.serialized_messages)
                         // Assuming data is an array of chat objects
                         $('#messages').empty(); // Clear previous messages
                         
                         messages.forEach(function(chat) {
                             var messageHtml;
-                            console.log("chat: ",chat)
+                            //console.log("chat: ",chat)
                 if (chat[1] == "user") {
                     messageHtml = `
-                        <div class="usertalk-inner">
+                        <div class="usertalk-inner reply-inner">
                             <div class="chatuser-img">
-                                <img src="{% static 'assets/img/chat-user.svg' %}" class="img-responsive">
+                                <img src="${chat[3].profilepic}" class="img-responsive">
                             </div>
                             <div class="userleft-msg">
                                 <span>${chat[0]}</span>
                                 <div class="msg-dt">
-                                    <label>just now</label>
-                                    <div class="action-button-list">
-                                        <button class="btn-scolor"><i class="ri-add-line"></i>Add to task</button>
-                                    </div>
+                                    <label>${chat[2]}</label>   
                                 </div>
                             </div>
                         </div>
                     `;
                 } else {
                     messageHtml = `
-                        <div class="usertalk-inner reply-inner" >
+                        <div class="usertalk-inner" >
                             <div class="chatuser-img">
-                                <img src="{% static 'assets/img/chat-user.svg' %}" class="img-responsive">
+                                <img src="${chat[3].coach_profile_image}" class="img-responsive">
                             </div>
                             <div class="userleft-msg">
                                 <span>${chat[0]}</span>
+                                <p hidden>${chat[4]}</p>
                                 <div class="msg-dt">
-                                    <label>just now</label>
+                                    <label>${chat[2]}</label>
                                     <div class="action-button-list">
-                                        <button class="btn-scolor"><i class="ri-add-line"></i>Add to task</button>
+                                        <button class="btn-scolor task_button" onclick="fetch_task()"><i class="ri-add-line"></i>Add to task</button>
                                     </div>
                                 </div>
                             </div>
@@ -316,7 +322,7 @@
         $('#send-btn').click(function() {
             $('#messages').append(typingreplyIndicatorHTML);
             const message = $('#message-input').val().trim();
-            console.log(message)
+            console.log("Message on send button click , Message is-> ",message)
             var formData ={
                 //'csrfmiddlewaretoken': csr,
                 'csrfmiddlewaretoken':$( "#csrfmiddlewaretoken" ).val(),
@@ -412,10 +418,40 @@
         // Append the new li element to the ul
         $('.chat-sender-list ul').append(messageLi);
     }
-    {% comment %} else {
-        // If ul is not empty, click on the first li element
-        $('.chat-sender-list ul li:first').click(); 
-    } {% endcomment %}
-    </script>
+
+    function fetch_task() {
+        var answerElement = event.target.closest('.usertalk-inner').querySelector('span');
+        var answer = answerElement.textContent.toString();  // Convert answer to string
+        var chatIdElement = event.target.closest('.usertalk-inner').querySelector('p');
+        var chat_id = chatIdElement.textContent.toString();  // Convert answer to string
+        var formData = new FormData();
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        formData.append('answer', answer);
+        formData.append('chat_id', chat_id);
+        alert("Extracting Task, Please wait few seconds")
+        $.ajax({
+            url: "{% url 'get_task' %}",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                // If the request is successful, alert the response
+               if  (response.success)
+               {
+                    console.log(response.task_list)
+               }
+               else
+               {
+                    alert(response.message)
+               }
+            },
+            error: function(xhr, status, error) {
+                // If there's an error with the request, alert an error message
+                alert("Error: " + xhr.responseText);
+            }
+        });
+    };
+</script>
 
     {% endblock %}

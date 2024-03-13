@@ -230,9 +230,25 @@ def find_coach(request):
 @login_required   
 def coach(request):
     context={}
-    all_coach_details=AiCoach.objects.all()
-    context.update({'all_coach_details':all_coach_details})
+    search_query = request.GET.get('search', '')
+    if search_query:
+        all_coach_details = AiCoach.objects.filter(
+            Q(coach_name__icontains=search_query) |  
+            Q(coach_expertise__icontains=search_query) |  
+            Q(coach_experience__icontains=search_query) |  
+            Q(coach_degree__icontains=search_query) |  
+            Q(coaching_types__icontains=search_query) |  
+            Q(target_audience__icontains=search_query) |  
+            Q(languages__icontains=search_query) |  
+            Q(specialities__icontains=search_query) |  
+            Q(coach_about__icontains=search_query)  
+        )
+        context.update({'all_coach_details' : all_coach_details})
+    else:
+        all_coach_details=AiCoach.objects.all()
+        context.update({'all_coach_details':all_coach_details})
     return render(request,"achievemate/dashboard/coach.html",context)
+
 @login_required
 def coach_details(request,pk):
     context={}
@@ -291,15 +307,65 @@ def send_message(request):
         return JsonResponse({'status': 'Message sent successfully'})
     else:
         return JsonResponse({'error': 'Invalid request method'})
-@login_required  
+# @login_required  
+# def get_messages(request):
+#     uid = request.GET.get('uid')
+#     cid = request.GET.get('cid')
+#     # Retrieve messages from the Chat model
+#     messages = Chat.objects.filter(is_deleted=0,user_id=uid,coach_id=cid).order_by('created_date')
+#     print(messages)
+#     message_texts = [[message.chat_text,message.user_type] for message in messages]
+    
+#     return JsonResponse({'messages': message_texts})
+from django.shortcuts import get_object_or_404
+from .models import Chat, Users, UserProfile, AiCoach
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+
+@login_required
 def get_messages(request):
     uid = request.GET.get('uid')
     cid = request.GET.get('cid')
-    # Retrieve messages from the Chat model
-    messages = Chat.objects.filter(is_deleted=0,user_id=uid,coach_id=cid).order_by('created_date')
-    print(messages)
-    message_texts = [[message.chat_text,message.user_type] for message in messages]
     
+    # Retrieve messages from the Chat model
+    messages = Chat.objects.filter(is_deleted=0, user_id=uid, coach_id=cid).order_by('created_date')
+    message_texts = []
+    
+    for message in messages:
+        if message.user_type == 'user':
+            user = get_object_or_404(Users, id=uid)
+            user_profile = get_object_or_404(UserProfile, user_id=uid)
+            user_data = {
+                # 'type': 'user',
+                # 'firstname': user_profile.firstname,
+                # 'lastname': user_profile.lastname,
+                'profilepic': str(user_profile.profilepic.url),
+                # 'email': user.email,
+                # 'role': user.role,
+                # 'user_type': user.user_type,
+                # 'google_id': user.google_id,
+                # Add other user fields here
+            }
+            message_texts.append([message.chat_text, message.user_type,message.created_date.strftime("%d-%m-%Y %I:%M %p"), user_data,message.id])
+        elif message.user_type == 'coach':
+            coach = get_object_or_404(AiCoach, id=cid)
+            coach_data = {
+                # 'type': 'coach',
+                # 'coach_name': coach.coach_name,
+                # 'coach_expertise': coach.coach_expertise,
+                # 'coach_experience': coach.coach_experience,
+                # 'coach_about': coach.coach_about,
+                # 'coach_degree': coach.coach_degree,
+                'coach_profile_image': str(coach.coach_profile_image.url),
+                # 'coaching_types': coach.coaching_types,
+                # 'target_audience': coach.target_audience,
+                # 'specialities': coach.specialities,
+                # 'languages': coach.languages,
+                # 'rating': str(coach.rating),
+                # Add other coach fields here
+            }
+            message_texts.append([message.chat_text, message.user_type,message.created_date.strftime("%d-%m-%Y %I:%M %p"), coach_data, message.id])
+
     return JsonResponse({'messages': message_texts})
 
 def dashbaord(request):
@@ -308,3 +374,36 @@ def dashbaord(request):
 def progress_tracking(request):
     return render(request,"achievemate/dashboard/progress_tracking.html")
 
+import requests
+from datetime import datetime,timedelta
+def get_task(request):
+    try:
+        url = "http://127.0.0.1:5000/task_list"
+        answer=request.POST.get("answer","")
+        chat_id=request.POST.get("chat_id","")
+        payload = {'answer': answer}
+        files=[]
+        headers = {}
+        response = requests.request("POST", url, headers=headers, data=payload, files=files)
+        # print("response--->",response.json()["task_list"])
+        chat_data=Chat.objects.filter(id=int(chat_id))[0]
+        # user_data=User.objects.get
+        # print("Chat_data of task list----> ",chat_data)
+        tasks=response.json()["task_list"]
+        # print("Tasks fetched from api ,", tasks)
+        tasks = tasks.split(',')
+        # print("tasks after spliiting from numbers--->",tasks)
+        tasks = [task.strip() for task in tasks if task.strip()]
+        # print("tasks after strip--->",tasks)
+        for task in tasks:
+            Tasks.objects.create(
+                chat =chat_data,
+                user_id = chat_data.user_id,
+                coach_id =chat_data.coach_id,
+                task_title = str(task).capitalize(),
+                task_status = "started",
+                due_date =  datetime.now() + timedelta(weeks=1)
+            )
+        return JsonResponse({'success':True,"task_list":response.json()["task_list"]})
+    except:
+        return JsonResponse({'success':False,"message":"Task List Coudn't be fetched, Please Try Again later"})

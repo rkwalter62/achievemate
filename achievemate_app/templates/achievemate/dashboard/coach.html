@@ -213,9 +213,9 @@
                                     <div class="row mb-4">
                                         <div class="col-12">
                                             <!-- coach-search-form -->
-                                            <form class="coach-search-form">
+                                            <form class="coach-search-form" action="{% url 'coach' %}" method="get">
                                                 <div class="form-group">
-                                                    <input type="text" name="" value="" placeholder="Search" class="form-control" />
+                                                    <input type="text" name="search" value="" placeholder="Search" class="form-control" />
                                                     <span class="input-icon"><i class="ri-search-line"></i></span>
                                                 </div>
                                             </form>
@@ -268,216 +268,6 @@
                                         </div>
                                         {% endfor %}
                                         <!-- Loop END  -->
-                                        {% comment %} <div class="col">
-                                            <a href="coach_details.html" class="single-coach-wrap">
-                                                <!-- coach-info-card -->
-                                                <div class="coach-info-card">
-                                                    <div class="coach-info-content">
-                                                        <!-- coach-info-head  -->
-                                                        <div class="coach-info-head">
-                                                            <!-- coach-img -->
-                                                            <div class="coach-img">
-                                                                <img src="{% static 'assets/img/coach/coach-02.jpg' %}" lat="img/coach/coach-02" />
-                                                            </div>
-                                                            <!-- coach-ganeral-info-wrap -->
-                                                            <div class="coach-ganeral-info-wrap">
-                                                                <div class="coach-intro">
-                                                                    <h5 class="c_name">Amelia Smith</h5>
-                                                                    <span class="c_designation">Health Expart</span>
-                                                                </div>
-                                                                <!-- coach-education -->
-                                                                <div class="coach-education">
-                                                                    <span>
-                                                                        <img src="{% static 'assets/img/icon/svg/experience.svg' %}" alt="icon/svg/experience" />
-                                                                        5 Yrs of Experience
-                                                                    </span>
-                                                                    <span>
-                                                                        <img src="{% static 'assets/img/icon/svg/degree.svg' %}" alt="icon/svg/degree" />
-                                                                        MBA
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <!-- coach-info-body -->
-                                                        <div class="coach-info-body">
-                                                            <p>Embark on a delightful culinary adventure with Chef Amelia! A seasoned chef with a flair for creative cooking, Amelia is passionate about bringing people together through food. Her interactive cooking sessions are not just about recipes; they're about storytelling, technique, and the joy of creating something delicious.</p>
-                                                        </div>
-                                                    </div>
-                                                    <!-- coach-info-footer -->
-                                                    <div class="coach-info-footer">
-                                                            <a href="chat.html" class="btn start-session-btn">Start Session</a>
-                                                    </div>
-                                                </div>
-                                            </a>
-                                        </div>
-                                        <div class="col">
-                                            <a href="coach_details.html" class="single-coach-wrap">
-                                                <!-- coach-info-card -->
-                                                <div class="coach-info-card">
-                                                    <div class="coach-info-content">
-                                                        <!-- coach-info-head  -->
-                                                        <div class="coach-info-head">
-                                                            <!-- coach-img -->
-                                                            <div class="coach-img">
-                                                                <img src="{% static 'assets/img/coach/coach-04.jpg' %}" lat="img/coach/coach-04" />
-                                                            </div>
-                                                            <!-- coach-ganeral-info-wrap -->
-                                                            <div class="coach-ganeral-info-wrap">
-                                                                <div class="coach-intro">
-                                                                    <h5 class="c_name">Mark Miller</h5>
-                                                                    <span class="c_designation">Health Expart</span>
-                                                                </div>
-                                                                <!-- coach-education -->
-                                                                <div class="coach-education">
-                                                                    <span>
-                                                                        <img src="{% static 'assets/img/icon/svg/experience.svg' %}" alt="icon/svg/experience" />
-                                                                        5 Yrs of Experience
-                                                                    </span>
-                                                                    <span>
-                                                                        <img src="{% static 'assets/img/icon/svg/degree.svg' %}" alt="icon/svg/degree" />
-                                                                        MBA
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <!-- coach-info-body -->
-                                                        <div class="coach-info-body">
-                                                            <p>Embark on a delightful culinary adventure with Chef Amelia! A seasoned chef with a flair for creative cooking, Amelia is passionate about bringing people together through food. Her interactive cooking sessions are not just about recipes; they're about storytelling, technique, and the joy of creating something delicious.</p>
-                                                        </div>
-                                                    </div>
-                                                    <!-- coach-info-footer -->
-                                                    <div class="coach-info-footer">
-                                                            <a href="chat.html" class="btn start-session-btn">Start Session</a>
-                                                    </div>
-                                                </div>
-                                            </a>
-                                        </div>
-                                        <div class="col">
-                                            <a href="coach_details.html" class="single-coach-wrap">
-                                                <!-- coach-info-card -->
-                                                <div class="coach-info-card">
-                                                    <div class="coach-info-content">
-                                                        <!-- coach-info-head  -->
-                                                        <div class="coach-info-head">
-                                                            <!-- coach-img -->
-                                                            <div class="coach-img">
-                                                                <img src="{% static 'assets/img/coach/coach-01.jpg' %}" lat="img/coach/coach-01" />
-                                                            </div>
-                                                            <!-- coach-ganeral-info-wrap -->
-                                                            <div class="coach-ganeral-info-wrap">
-                                                                <div class="coach-intro">
-                                                                    <h5 class="c_name">Wade Warren</h5>
-                                                                    <span class="c_designation">Health Expart</span>
-                                                                </div>
-                                                                <!-- coach-education -->
-                                                                <div class="coach-education">
-                                                                    <span>
-                                                                        <img src="{% static 'assets/img/icon/svg/experience.svg' %}" alt="icon/svg/experience" />
-                                                                        5 Yrs of Experience
-                                                                    </span>
-                                                                    <span>
-                                                                        <img src="{% static 'assets/img/icon/svg/degree.svg' %}" alt="icon/svg/degree" />
-                                                                        MBA
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <!-- coach-info-body -->
-                                                        <div class="coach-info-body">
-                                                            <p>Embark on a delightful culinary adventure with Chef Amelia! A seasoned chef with a flair for creative cooking, Amelia is passionate about bringing people together through food. Her interactive cooking sessions are not just about recipes; they're about storytelling, technique, and the joy of creating something delicious.</p>
-                                                        </div>
-                                                    </div>
-                                                    <!-- coach-info-footer -->
-                                                    <div class="coach-info-footer">
-                                                            <a href="chat.html" class="btn start-session-btn">Start Session</a>
-                                                    </div>
-                                                </div>
-                                            </a>
-                                        </div>
-                                        <div class="col">
-                                            <a href="coach_details.html" class="single-coach-wrap">
-                                                <!-- coach-info-card -->
-                                                <div class="coach-info-card">
-                                                    <div class="coach-info-content">
-                                                        <!-- coach-info-head  -->
-                                                        <div class="coach-info-head">
-                                                            <!-- coach-img -->
-                                                            <div class="coach-img">
-                                                                <img src="{% static 'assets/img/coach/coach-02.jpg' %}" lat="img/coach/coach-02" />
-                                                            </div>
-                                                            <!-- coach-ganeral-info-wrap -->
-                                                            <div class="coach-ganeral-info-wrap">
-                                                                <div class="coach-intro">
-                                                                    <h5 class="c_name">Amelia Smith</h5>
-                                                                    <span class="c_designation">Health Expart</span>
-                                                                </div>
-                                                                <!-- coach-education -->
-                                                                <div class="coach-education">
-                                                                    <span>
-                                                                        <img src="{% static 'assets/img/icon/svg/experience.svg' %}" alt="icon/svg/experience" />
-                                                                        5 Yrs of Experience
-                                                                    </span>
-                                                                    <span>
-                                                                        <img src="{% static 'assets/img/icon/svg/degree.svg' %}" alt="icon/svg/degree" />
-                                                                        MBA
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <!-- coach-info-body -->
-                                                        <div class="coach-info-body">
-                                                            <p>Embark on a delightful culinary adventure with Chef Amelia! A seasoned chef with a flair for creative cooking, Amelia is passionate about bringing people together through food. Her interactive cooking sessions are not just about recipes; they're about storytelling, technique, and the joy of creating something delicious.</p>
-                                                        </div>
-                                                    </div>
-                                                    <!-- coach-info-footer -->
-                                                    <div class="coach-info-footer">
-                                                            <a href="chat.html" class="btn start-session-btn">Start Session</a>
-                                                    </div>
-                                                </div>
-                                            </a>
-                                        </div>
-                                        <div class="col">
-                                            <a href="coach_details.html" class="single-coach-wrap">
-                                                <!-- coach-info-card -->
-                                                <div class="coach-info-card">
-                                                    <div class="coach-info-content">
-                                                        <!-- coach-info-head  -->
-                                                        <div class="coach-info-head">
-                                                            <!-- coach-img -->
-                                                            <div class="coach-img">
-                                                                <img src="{% static 'assets/img/coach/coach-04.jpg' %}" lat="img/coach/coach-04" />
-                                                            </div>
-                                                            <!-- coach-ganeral-info-wrap -->
-                                                            <div class="coach-ganeral-info-wrap">
-                                                                <div class="coach-intro">
-                                                                    <h5 class="c_name">Mark Miller</h5>
-                                                                    <span class="c_designation">Health Expart</span>
-                                                                </div>
-                                                                <!-- coach-education -->
-                                                                <div class="coach-education">
-                                                                    <span>
-                                                                        <img src="{% static 'assets/img/icon/svg/experience.svg' %}" alt="icon/svg/experience" />
-                                                                        5 Yrs of Experience
-                                                                    </span>
-                                                                    <span>
-                                                                        <img src="{% static 'assets/img/icon/svg/degree.svg' %}" alt="icon/svg/degree" />
-                                                                        MBA
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <!-- coach-info-body -->
-                                                        <div class="coach-info-body">
-                                                            <p>Embark on a delightful culinary adventure with Chef Amelia! A seasoned chef with a flair for creative cooking, Amelia is passionate about bringing people together through food. Her interactive cooking sessions are not just about recipes; they're about storytelling, technique, and the joy of creating something delicious.</p>
-                                                        </div>
-                                                    </div>
-                                                    <!-- coach-info-footer -->
-                                                    <div class="coach-info-footer">
-                                                            <a href="chat.html" class="btn start-session-btn">Start Session</a>
-                                                    </div>
-                                                </div>
-                                            </a>
-                                        </div> {% endcomment %}
                                     </div>
                                 </div>
                             </div>
@@ -491,4 +281,9 @@
     <!-- page-layout END -->
 
 
+    {% endblock %}
+    {% block script %}
+    <script>
+
+    </script>
     {% endblock %}

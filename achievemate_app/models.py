@@ -183,8 +183,8 @@ class Tasks(BaseModel):
     chat = models.ForeignKey('Chat', models.DO_NOTHING, blank=True, null=True)
     user = models.ForeignKey('Users', models.DO_NOTHING, blank=True, null=True)
     coach = models.ForeignKey('AiCoach', models.DO_NOTHING,blank=True, null=True)
-    task_title = models.CharField(max_length=255, blank=True, null=True)
-    task_status = models.CharField(max_length=14, choices=TASK_STATUS_CHOICES,blank=True, null=True)
+    task_title = models.TextField(max_length=255, blank=True, null=True)
+    task_status = models.CharField(max_length=14, choices=TASK_STATUS_CHOICES,blank=True, null=True,default="started")
     due_date = models.DateTimeField(blank=True, null=True)
 
     class Meta:
