@@ -30,7 +30,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 DEBUG = True
 
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost','3.220.247.187']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost','3.220.247.187','achievemate.ai','https://achievemate.ai']
 SECURE_CROSS_ORIGIN_OPENER_POLICY = None
 
 # Application definition
