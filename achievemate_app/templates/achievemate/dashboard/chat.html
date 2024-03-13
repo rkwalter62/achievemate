@@ -217,7 +217,8 @@
         const roomName = `room_${uid}_${cid}`;
         //const socket = new WebSocket(`ws://localhost:8000/ws/chat/${roomName}/`);
         const socket = new WebSocket(
-            'ws://' +
+            //'ws://' +
+            'wss://' +
             window.location.host +
             '/ws/chat/' +
             roomName +
