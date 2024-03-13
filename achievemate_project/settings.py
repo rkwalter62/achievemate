@@ -32,6 +32,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost','3.220.247.187','achievemate.ai','https://achievemate.ai']
 SECURE_CROSS_ORIGIN_OPENER_POLICY = None
+CSRF_TRUSTED_ORIGINS =['https://127.0.0.1', 'https://localhost','https://3.220.247.187','http://achievemate.ai','https://achievemate.ai']
 
 # Application definition
 
