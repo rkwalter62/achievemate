@@ -402,7 +402,7 @@ def get_task(request):
                 coach_id =chat_data.coach_id,
                 task_title = str(task).capitalize(),
                 task_status = "started",
-                due_date =  datetime.now() + timedelta(weeks=1)
+                due_date =  datetime.now() + timedelta(weeks=2)
             )
         return JsonResponse({'success':True,"task_list":response.json()["task_list"]})
     except:
