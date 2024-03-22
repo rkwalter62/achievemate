@@ -51,6 +51,7 @@
 
         <!-- main-content start  -->
         <div class="main-content">
+            {% for tasks in all_tasks_collection%}
             <div class="row">
                 <div class="col-12">
                     <div class="table-responsive">
@@ -61,7 +62,7 @@
                                         <th>
                                             <div class="task-head">
                                                 <span class="task-title">task name</span>
-                                                Health Expert
+                                               {{tasks.0.coach.coach_expertise}}
                                             </div>
                                         </th>
                                         <th>Coach Name</th>
@@ -71,61 +72,43 @@
                                 </thead>
                                 <tbody>
                                     <!-- Loop start  -->
+                                    {% for task in tasks %}
                                     <tr>
                                         <td>
                                             <div class="task-data">
-                                                <span class="task-data-title">Achieve a healthy and sustainable
-                                                    weight.</span>
-                                                <span class="task-data-time"> Due : 27 Dec,203 </span>
+                                                <span class="task-data-title">{{task.task_title|title}}</span>
+                                                <span class="task-data-time"> Due : {{task.due_date}}</span>
                                             </div>
                                         </td>
-                                        <td>Wade Warren</td>
+                                        <td>{{task.coach.coach_name}}</td>
                                         <td>
-                                            <span class="badge bg-success">In progress</span>
-                                        </td>
+                                                <select class="badge bg-warning" id="taskStatusDropdown_{{ task.id }}" style="border: none;" onchange="handleStatusChange(this)">
+                                                    {% for status, _ in task.TASK_STATUS_CHOICES %}
+                                                        <option value="{{ status }}" {% if status == task.task_status %} selected {% endif %}>{{ status }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                        </td> 
                                         <td>Write comment</td>
+                                        {% comment %} <td><a href="#" class="btn" data-bs-toggle="modal" data-bs-target="#commentModal">
+                                            <span class="auth-icon"></span>
+                                            <span class="auth-text"> Show Activity</span>
+                                        </a></td> {% endcomment %}
                                     </tr>
-                                    <!-- Loop END  -->
-                                    <tr>
-                                        <td>
-                                            <div class="task-data">
-                                                <span class="task-data-title">Improve cardiovascular fitness through
-                                                    aerobic exercises.</span>
-                                                <span class="task-data-time"> Due : 27 Dec,203 </span>
-                                            </div>
-                                        </td>
-                                        <td>Michael Williams</td>
-                                        <td>
-                                            <span class="badge bg-success">In progress</span>
-                                        </td>
-                                        <td>Show activity (1)</td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="task-data">
-                                                <span class="task-data-title">Maintain a balanced diet with appropriate
-                                                    caloric intake.</span>
-                                                <span class="task-data-time"> Due : 27 Dec,203 </span>
-                                            </div>
-                                        </td>
-                                        <td>Wade Warren</td>
-                                        <td>
-                                            <span class="badge bg-danger">Late</span>
-                                        </td>
-                                        <td>Show activity (1)</td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="999" class="text-center text-scolor">
-                                            No Record Found!
-                                        </td>
-                                    </tr>
+                                    {% endfor %}
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="row">
+            {% empty %}
+            <tr>
+                <td colspan="999" class="text-center text-scolor">
+                    No Record Found!
+                </td>
+            </tr> 
+            {% endfor %}
+            {% comment %} <div class="row">
                 <div class="col-12">
                     <div class="table-responsive">
                         <div class="simple-table sticky-table">
@@ -171,9 +154,119 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> {% endcomment %}
         </div>
         <!-- main-content END -->
     </section>
     <!-- page-layout END -->
+
+    <div class="modal fade" id="commentModal" tabindex="-1" aria-labelledby="commentModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="commentModalLabel">Comments</h5>
+                </div>
+                <div class="modal-body">
+                    <ul class="list-group">
+                        {% for comment in comments %}
+                        <li class="list-group-item">{{ comment.comment }}</li>
+                        {% empty %}
+                        <li class="list-group-item">No comments yet.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block script %}
+<script>
+function handleStatusChange(select) {
+    var taskId = select.id.split('_')[1];
+    var newStatus = select.value;
+
+    // Send AJAX request to update task status
+    $.ajax({
+        url: '{% url "update_task_status" %}',
+        type: 'POST',
+        data: {
+            task_id: taskId,
+            new_status: newStatus,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function(response) {
+            // Update the task status on success
+            if (response.success)
+            {
+                alert(response.message)
+            }
+            var selectedOption = select.options[select.selectedIndex];
+            var newClass = "";
+            
+            switch(newStatus) {
+                case 'Remaining':
+                    newClass = 'badge bg-warning';
+                    break;
+                case 'In Progress':
+                    newClass = 'badge bg-info';
+                    break;
+                case 'Done':
+                    newClass = 'badge bg-success';
+                    break;
+                case 'Delayed':
+                    newClass = 'badge bg-danger';
+                    break;
+                default:
+                    newClass = 'badge bg-secondary';
+            }
+            
+            // Remove all existing classes
+            select.classList.remove('badge', 'bg-warning', 'bg-info', 'bg-success', 'bg-danger', 'bg-secondary');
+             // Remove all existing classes and add the new class
+             select.className = newClass;
+        },
+        error: function(xhr, status, error) {
+            console.error(error);
+        }
+    });
+}
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Get all select elements with IDs starting with 'taskStatusDropdown_'
+    var selects = document.querySelectorAll('select[id^="taskStatusDropdown_"]');
+    
+    // Iterate over each select element
+    selects.forEach(function(select) {
+        // Get the selected option's value
+        var newStatus = select.value;
+        var newClass = "";
+
+        switch (newStatus) {
+            case 'Remaining':
+                newClass = 'badge bg-warning';
+                break;
+            case 'In Progress':
+                newClass = 'badge bg-info';
+                break;
+            case 'Done':
+                newClass = 'badge bg-success';
+                break;
+            case 'Delayed':
+                newClass = 'badge bg-danger';
+                break;
+            default:
+                newClass = 'badge bg-secondary';
+        }
+
+        // Set the class for the select element
+        select.className = newClass;
+    });
+});
+
+
+</script>
 {% endblock %}

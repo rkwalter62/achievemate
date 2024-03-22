@@ -86,7 +86,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if expertise=="Life Coaching Experts":
             print("inside expertise")
             # url = "http://127.0.0.1:5000/life_coaching_expert"
-            url = "http://3.220.247.187:9001/life_coaching_expert"
+            # url = "http://3.220.247.187:9001/life_coaching_expert"
+            url = "https://api.achievemate.ai/Achievemate/life_coaching_expert"
 
             payload = {'question': query}
             files=[
@@ -104,7 +105,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         elif expertise=="Health Experts":
             print("inside expertise")
             # url = "http://127.0.0.1:5000/health_expert"
-            url = "http://3.220.247.187:9001/health_expert"
+            # url = "http://3.220.247.187:9001/health_expert"
+            url = "https://api.achievemate.ai/Achievemate/health_expert"
 
             payload = {'question': query}
             files=[
@@ -122,7 +124,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         elif expertise=="Business Idea Experts":
             print("inside expertise")
             # url = "http://127.0.0.1:5000/Business_expert"
-            url = "http://3.220.247.187:9001/Business_expert"
+            # url = "http://3.220.247.187:9001/Business_expert"
+            url = "https://api.achievemate.ai/Achievemate/Business_expert"
 
             payload = {'question': query}
             files=[
@@ -140,7 +143,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         elif expertise=="Career Experts":
             print("inside expertise")
             # url = "http://127.0.0.1:5000/Career_expert"
-            url = "http://3.220.247.187:9001/Career_expert"
+            # url = "http://3.220.247.187:9001/Career_expert"
+            url = "https://api.achievemate.ai/Achievemate/Career_expert"
 
             payload = {'question': query}
             files=[

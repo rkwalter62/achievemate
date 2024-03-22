@@ -326,8 +326,25 @@ from django.contrib.auth.decorators import login_required
 def get_messages(request):
     uid = request.GET.get('uid')
     cid = request.GET.get('cid')
-    
+    current_coach=AiCoach.objects.get(id=cid)
     # Retrieve messages from the Chat model
+    messages = Chat.objects.filter(is_deleted=0, user_id=uid, coach_id=cid).order_by('created_date')
+    if messages.count()==0:
+        if current_coach.coach_expertise=="Life Coaching Experts":
+            introductory_message=f"Welcome to Life Guidance with {current_coach.coach_name}! Here to support you on your journey towards personal growth and fulfillment. Feel free to ask any questions or share your concerns. Let's embark on this journey together."
+        elif current_coach.coach_expertise=="Health Experts":
+            introductory_message=f"Welcome to Wellness Wisdom with {current_coach.coach_name}! Ready to guide you towards a healthier lifestyle and answer your health-related questions. Let's prioritize your well-being together."
+        elif current_coach.coach_expertise=="Business Idea Experts":
+            introductory_message=f"Welcome to Business Insight with {current_coach.coach_name}! Here to help you brainstorm innovative ideas and strategize for success in your ventures. Let's unlock your entrepreneurial potential together."
+        elif current_coach.coach_expertise=="Career Experts":
+            introductory_message=f"Welcome to Career Compass with {current_coach.coach_name}! Here to guide you towards a fulfilling and successful career path. Let's explore your professional goals and aspirations together."
+        
+        chat = Chat.objects.create(
+            chat_text=introductory_message,
+            user_type='coach',
+            user_id=uid,
+            coach_id=cid
+        )
     messages = Chat.objects.filter(is_deleted=0, user_id=uid, coach_id=cid).order_by('created_date')
     message_texts = []
     
@@ -369,16 +386,61 @@ def get_messages(request):
     return JsonResponse({'messages': message_texts})
 
 def dashbaord(request):
-    return render(request,"achievemate/dashboard/dashboard.html")
+    all_coach_ids = Tasks.objects.filter(user_id=request.user).values_list('coach_id', flat=True).distinct()
+    print("All coach ID ", all_coach_ids)
+    all_coaches = AiCoach.objects.filter(id__in=all_coach_ids)
+    all_tasks_collection = []
+    for one_id in all_coach_ids:
+        all_tasks_coach = Tasks.objects.filter(coach_id=one_id)
+        all_tasks_collection.append(all_tasks_coach)
+    print(all_tasks_collection)
+    context = {
+        'all_tasks_collection': all_tasks_collection,
+        'all_coaches': all_coaches,
+    }
+    
+    return render(request,"achievemate/dashboard/dashboard.html",context)
+
+def update_task_status(request):
+    if request.method == 'POST':
+        task_id = request.POST.get('task_id')
+        new_status = request.POST.get('new_status')
+        
+        # Update task status in the database
+        task = Tasks.objects.get(pk=task_id)
+        task.task_status = new_status
+        task.save()
+        if new_status == "In Progress":
+            activity="task_in_progress"
+        elif new_status=="Done":
+            activity='task_completed'
+        # elif new_status=="Remaining":
+        #     activity='task_remaining'
+        # elif new_status=="Delayed":
+        #     activity='task_delayed'
+         # Retrieve the corresponding notification comment
+        activity_type_label = dict(Activity_Log.ACTIVITY_TYPE_CHOICES).get(activity, '')
+        activity_log=Activity_Log.objects.create(
+            user = request.user,
+            coach_id= task.coach.id,
+            activity_type = activity,
+            notification_comment= f"You have mark {activity_type_label} for {task.coach.coach_name}"
+        )
+        # print("Task saved in update task status---> ",task)
+        return JsonResponse({"success":True,'message': f'{activity_log.notification_comment}'}, status=200)
+    else:
+        return JsonResponse({'error': 'Invalid request'}, status=400)
 
 def progress_tracking(request):
     return render(request,"achievemate/dashboard/progress_tracking.html")
 
 import requests
 from datetime import datetime,timedelta
+import re
 def get_task(request):
     try:
-        url = "http://127.0.0.1:5000/task_list"
+        url = "https://api.achievemate.ai/Achievemate/task_list"
+        # url="http://127.0.0.1:5000/task_list"
         answer=request.POST.get("answer","")
         chat_id=request.POST.get("chat_id","")
         payload = {'answer': answer}
@@ -387,23 +449,32 @@ def get_task(request):
         response = requests.request("POST", url, headers=headers, data=payload, files=files)
         # print("response--->",response.json()["task_list"])
         chat_data=Chat.objects.filter(id=int(chat_id))[0]
-        # user_data=User.objects.get
-        # print("Chat_data of task list----> ",chat_data)
         tasks=response.json()["task_list"]
-        # print("Tasks fetched from api ,", tasks)
-        tasks = tasks.split(',')
-        # print("tasks after spliiting from numbers--->",tasks)
+        # print("Tasks--->",tasks)
+        tasks = tasks.split('\n\n')
+        
+        # tasks = re.split(r'\n(?=\d+\.)', tasks.strip())
         tasks = [task.strip() for task in tasks if task.strip()]
-        # print("tasks after strip--->",tasks)
-        for task in tasks:
-            Tasks.objects.create(
-                chat =chat_data,
-                user_id = chat_data.user_id,
-                coach_id =chat_data.coach_id,
-                task_title = str(task).capitalize(),
-                task_status = "started",
-                due_date =  datetime.now() + timedelta(weeks=2)
-            )
-        return JsonResponse({'success':True,"task_list":response.json()["task_list"]})
+        chat_tasks=Tasks.objects.filter(chat=chat_data).count()
+        if chat_tasks == 0:
+        # print("Tasks fetched from api ,", tasks)
+        # print("tasks after spliiting from numbers--->",tasks)
+            for task in tasks:
+                if task != "Task List:":
+                    Tasks.objects.create(
+                        chat =chat_data,
+                        user_id = chat_data.user_id,
+                        coach_id =chat_data.coach_id,
+                        task_title = str(task).capitalize(),
+                        task_status = "Remaining",
+                        due_date =  datetime.now() + timedelta(weeks=2)
+                    )
+        activity_log=Activity_Log.objects.create(
+            user = request.user,
+            coach_id= chat_data.coach_id,
+            activity_type = "task_cretated",
+            notification_comment= f"Task Added for coach {chat_data.coach.coach_name}"
+        )
+        return JsonResponse({'success':True,"task_list":response.json()["task_list"],"message":f"{activity_log.notification_comment}"})
     except:
         return JsonResponse({'success':False,"message":"Task List Coudn't be fetched, Please Try Again later"})

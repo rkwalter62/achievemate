@@ -218,7 +218,7 @@
         //const socket = new WebSocket(`ws://localhost:8000/ws/chat/${roomName}/`);
         const socket = new WebSocket(
             //'ws://' +
-            'wss://' +
+            'ws://' +
             window.location.host +
             '/ws/chat/' +
             roomName +
@@ -440,7 +440,7 @@
                 // If the request is successful, alert the response
                if  (response.success)
                {
-                    console.log(response.task_list)
+                    alert(response.message)
                }
                else
                {

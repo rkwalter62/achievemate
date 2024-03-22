@@ -175,18 +175,32 @@ class UserAnswer(BaseModel):
         
 class Tasks(BaseModel):
     TASK_STATUS_CHOICES = [
-        ('started', 'started'),
-        ('in_progress', 'in_progress'),
-        ('need_attention', 'need_attention'),
-        ('completed', 'completed'),
+        ('Remaining', 'Remaining'),
+        ('In Progress', 'In Progress'),
+        ('Done', 'Done'),
+        ('Delayed', 'Delayed'),
     ]
     chat = models.ForeignKey('Chat', models.DO_NOTHING, blank=True, null=True)
     user = models.ForeignKey('Users', models.DO_NOTHING, blank=True, null=True)
     coach = models.ForeignKey('AiCoach', models.DO_NOTHING,blank=True, null=True)
     task_title = models.TextField(max_length=255, blank=True, null=True)
-    task_status = models.CharField(max_length=14, choices=TASK_STATUS_CHOICES,blank=True, null=True,default="started")
+    task_status = models.CharField(max_length=14, choices=TASK_STATUS_CHOICES,blank=True, null=True,default="Remaining")
     due_date = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         managed = True
         db_table = 'tasks'
+
+class Activity_Log(BaseModel):
+    ACTIVITY_TYPE_CHOICES = [
+        ('task_created', 'Task Created'),
+        ('task_in_progress', 'Task In Progress'),
+        ('task_completed', 'Task Completed'),
+        ('task_remaining', 'Task Remaining'),
+        ('task_delayed', 'Task Delayed'),
+        ('comment_added', 'Comment Added'),
+    ]
+    user = models.ForeignKey('Users', models.DO_NOTHING, blank=True, null=True)
+    coach= models.ForeignKey('AiCoach', models.DO_NOTHING,blank=True, null=True)
+    activity_type = models.CharField(max_length=30, choices=ACTIVITY_TYPE_CHOICES,blank=True, null=True)
+    notification_comment = models.TextField(max_length=255, blank=True, null=True)
