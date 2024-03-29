@@ -385,7 +385,7 @@ def get_messages(request):
 
     return JsonResponse({'messages': message_texts})
 
-def dashbaord(request):
+def dashboard(request):
     all_coach_ids = Tasks.objects.filter(user_id=request.user).values_list('coach_id', flat=True).distinct()
     print("All coach ID ", all_coach_ids)
     all_coaches = AiCoach.objects.filter(id__in=all_coach_ids)
@@ -393,13 +393,78 @@ def dashbaord(request):
     for one_id in all_coach_ids:
         all_tasks_coach = Tasks.objects.filter(coach_id=one_id)
         all_tasks_collection.append(all_tasks_coach)
-    print(all_tasks_collection)
+    # print(all_tasks_collection)
     context = {
         'all_tasks_collection': all_tasks_collection,
         'all_coaches': all_coaches,
     }
     
     return render(request,"achievemate/dashboard/dashboard.html",context)
+from django.core import serializers
+
+def load_activity_log(request, task_id):
+    # Retrieve the activity log for the specified task
+    task=Tasks.objects.get(id=task_id)
+    activity_logs= Activity_Log.objects.filter(tasks=task,user=request.user)
+    # Serialize the data for activity logs
+    activity_log_data = serializers.serialize('json', activity_logs)
+
+    # Serialize the data for the task
+    task_data = serializers.serialize('json', [task, ])
+
+    # Serialize the data for users related to the activity logs
+    user_ids = list(activity_logs.values_list('user', flat=True))
+    users = Users.objects.filter(id__in=user_ids)
+    user_data = serializers.serialize('json', users)
+
+    # Construct the JSON response
+    response_data = {
+        'activity_log_data': activity_log_data,
+        'task_data': task_data,
+        'user_data': user_data,
+    }
+
+    # Return the JSON response
+    return JsonResponse(response_data)
+# from django.core import serializers
+# from django.http import JsonResponse
+
+# def load_activity_log(request, task_id):
+#     try:
+#         # Retrieve the task
+#         task=Tasks.objects.get(id=task_id)
+#         activity_logs= Activity_Log.objects.filter(tasks=task,user=request.user)
+        
+#         # Serialize the data for activity logs
+#         activity_log_data = serializers.serialize('json', activity_logs)
+        
+#         # Serialize the data for the task
+#         task_data = serializers.serialize('json', [task, ])
+        
+#         # Retrieve Task_Commentss related to the task
+#         Task_Commentss = Task_Comments.objects.filter(tasks=task)
+        
+#         # Serialize the data for Task_Commentss
+#         comment_data = serializers.serialize('json', Task_Commentss)
+        
+#         # Serialize the data for users related to the activity logs
+#         user_ids = list(activity_logs.values_list('user', flat=True))
+#         users = Users.objects.filter(id__in=user_ids)
+#         user_data = serializers.serialize('json', users)
+        
+#         # Construct the JSON response
+#         response_data = {
+#             'activity_log_data': activity_log_data,
+#             'task_data': task_data,
+#             'comment_data': comment_data,  # Include comment data in the response
+#             'user_data': user_data,
+#         }
+        
+#         # Return the JSON response
+#         return JsonResponse(response_data)
+#     except Tasks.DoesNotExist:
+#         # Handle case where the task does not exist
+#         return JsonResponse({'error': 'Task does not exist'}, status=404)
 
 def update_task_status(request):
     if request.method == 'POST':
@@ -414,14 +479,15 @@ def update_task_status(request):
             activity="task_in_progress"
         elif new_status=="Done":
             activity='task_completed'
-        # elif new_status=="Remaining":
-        #     activity='task_remaining'
-        # elif new_status=="Delayed":
-        #     activity='task_delayed'
+        elif new_status=="Remaining":
+            activity='task_remaining'
+        elif new_status=="Delayed":
+            activity='task_delayed'
          # Retrieve the corresponding notification comment
         activity_type_label = dict(Activity_Log.ACTIVITY_TYPE_CHOICES).get(activity, '')
         activity_log=Activity_Log.objects.create(
             user = request.user,
+            tasks=task,
             coach_id= task.coach.id,
             activity_type = activity,
             notification_comment= f"You have mark {activity_type_label} for {task.coach.coach_name}"
@@ -438,9 +504,9 @@ import requests
 from datetime import datetime,timedelta
 import re
 def get_task(request):
-    try:
+    # try:
         url = "https://api.achievemate.ai/Achievemate/task_list"
-        # url="http://127.0.0.1:5000/task_list"
+        # url="http://127.0.0.1:5000/Achievemate/task_list"
         answer=request.POST.get("answer","")
         chat_id=request.POST.get("chat_id","")
         payload = {'answer': answer}
@@ -451,17 +517,18 @@ def get_task(request):
         chat_data=Chat.objects.filter(id=int(chat_id))[0]
         tasks=response.json()["task_list"]
         # print("Tasks--->",tasks)
-        tasks = tasks.split('\n\n')
         
         # tasks = re.split(r'\n(?=\d+\.)', tasks.strip())
-        tasks = [task.strip() for task in tasks if task.strip()]
+        # tasks = [task.strip() for task in tasks if task.strip()]
+        tasks=separate_tasks(tasks)
+        tasks = tasks.split('\n')
         chat_tasks=Tasks.objects.filter(chat=chat_data).count()
         if chat_tasks == 0:
         # print("Tasks fetched from api ,", tasks)
         # print("tasks after spliiting from numbers--->",tasks)
             for task in tasks:
                 if task != "Task List:":
-                    Tasks.objects.create(
+                    created_task=Tasks.objects.create(
                         chat =chat_data,
                         user_id = chat_data.user_id,
                         coach_id =chat_data.coach_id,
@@ -469,12 +536,46 @@ def get_task(request):
                         task_status = "Remaining",
                         due_date =  datetime.now() + timedelta(weeks=2)
                     )
-        activity_log=Activity_Log.objects.create(
-            user = request.user,
-            coach_id= chat_data.coach_id,
-            activity_type = "task_cretated",
-            notification_comment= f"Task Added for coach {chat_data.coach.coach_name}"
-        )
+                    activity_log=Activity_Log.objects.create(
+                        user = request.user,
+                        tasks=created_task,
+                        coach_id= chat_data.coach_id,
+                        activity_type = "task_cretated",
+                        notification_comment= f"Task Added for coach {chat_data.coach.coach_name}"
+                    )
         return JsonResponse({'success':True,"task_list":response.json()["task_list"],"message":f"{activity_log.notification_comment}"})
-    except:
+    # except:
         return JsonResponse({'success':False,"message":"Task List Coudn't be fetched, Please Try Again later"})
+def add_comment(request):
+    if request.method == 'POST':
+        task_id = request.POST.get('task_id')
+        comment_text = request.POST.get('comment')
+        
+        if task_id and comment_text:
+            # Get the task object
+            try:
+                task = Tasks.objects.get(pk=task_id)
+            except Tasks.DoesNotExist:
+                return JsonResponse({'success': False, 'error': 'Task does not exist'})
+            
+            # Create the comment
+            comment = Task_Comments.objects.create(tasks=task, user=request.user, text=comment_text)
+            activity_log=Activity_Log.objects.create(
+                        user = request.user,
+                        tasks=task,
+                        coach_id= task.coach_id,
+                        activity_type = "comment_added",
+                        notification_comment= f"Commented on Task"
+                    )
+            return JsonResponse({'success': True, 'comment_id': comment.id})
+        else:
+            return JsonResponse({'success': False, 'error': 'Incomplete data'})
+    else:
+        return JsonResponse({'success': False, 'error': 'Invalid request method'})
+    
+def separate_tasks(text: str) -> list:
+    separated_text = re.sub(r'\d+\.', '', text)
+    
+    # Remove leading and trailing whitespace and replace empty lines with hyphens
+    separated_text = '\n'.join(line.strip() for line in separated_text.split('\n') if line.strip())
+    return separated_text

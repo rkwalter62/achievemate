@@ -123,9 +123,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return answer
         elif expertise=="Business Idea Experts":
             print("inside expertise")
-            # url = "http://127.0.0.1:5000/Business_expert"
+            url = "http://127.0.0.1:5000/Achievemate/Business_expert"
             # url = "http://3.220.247.187:9001/Business_expert"
-            url = "https://api.achievemate.ai/Achievemate/Business_expert"
+            # url = "https://api.achievemate.ai/Achievemate/Business_expert"
 
             payload = {'question': query}
             files=[

@@ -200,7 +200,17 @@ class Activity_Log(BaseModel):
         ('task_delayed', 'Task Delayed'),
         ('comment_added', 'Comment Added'),
     ]
+    tasks=models.ForeignKey('Tasks',models.DO_NOTHING,blank=True,null=True)
     user = models.ForeignKey('Users', models.DO_NOTHING, blank=True, null=True)
     coach= models.ForeignKey('AiCoach', models.DO_NOTHING,blank=True, null=True)
     activity_type = models.CharField(max_length=30, choices=ACTIVITY_TYPE_CHOICES,blank=True, null=True)
     notification_comment = models.TextField(max_length=255, blank=True, null=True)
+    
+class Task_Comments(BaseModel):
+    tasks=models.ForeignKey('Tasks',models.DO_NOTHING,blank=True,null=True)
+    user = models.ForeignKey('Users', models.DO_NOTHING, blank=True, null=True)
+    text = models.TextField(blank=True, null=True)
+    
+    class Meta:
+        managed = True
+        db_table = 'task_comments'

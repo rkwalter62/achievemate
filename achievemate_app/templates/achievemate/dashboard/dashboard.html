@@ -88,7 +88,8 @@
                                                     {% endfor %}
                                                 </select>
                                         </td> 
-                                        <td>Write comment</td>
+                                        <td><a href="#" data-bs-toggle="modal" data-bs-target="#WriteComment" data-task-id="{{task.id}}">Write
+                                            comment</a></td>
                                         {% comment %} <td><a href="#" class="btn" data-bs-toggle="modal" data-bs-target="#commentModal">
                                             <span class="auth-icon"></span>
                                             <span class="auth-text"> Show Activity</span>
@@ -160,27 +161,79 @@
     </section>
     <!-- page-layout END -->
 
-    <div class="modal fade" id="commentModal" tabindex="-1" aria-labelledby="commentModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+    <!-- Modal Write Comment -->
+    <div class="modal fade timeline-modal" id="WriteComment" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-fullscreen-xl-down">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="commentModalLabel">Comments</h5>
-                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><i
+                        class="ri-close-line"></i></button>
                 <div class="modal-body">
-                    <ul class="list-group">
-                        {% for comment in comments %}
-                        <li class="list-group-item">{{ comment.comment }}</li>
-                        {% empty %}
-                        <li class="list-group-item">No comments yet.</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <h3 class="text-center" id="comment_title">Comment Title</h3>
+                    <!-- timeline STart  -->
+                    <div class="timeline">
+                        <ul id="activity-log-list">
+                            <li>
+                                <div class="time">
+                                    <!-- post date  -->
+                                    <h4 class="p_date">01 Jan 2020</h4>
+                                </div>
+                                <div class="content">
+                                    <!-- Author name  -->
+                                    <h3 class="author_name">Author Name</h3>
+                                    <!-- comment  -->
+                                    <p class="author_comment">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem
+                                        Ipsum has been the industry's standard dummy text ever since the 1500s. </p>
+                                </div>
+                            </li>
+
+                            <li>
+                                <div class="time">
+                                    <!-- post date  -->
+                                    <h4 class="p_date">01 Feb 2020</h4>
+                                </div>
+                                <div class="content">
+                                    <!-- Author name  -->
+                                    <h3 class="author_name">Author Name</h3>
+                                    <!-- comment  -->
+                                    <p class="author_comment">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem
+                                        Ipsum has been the industry's standard dummy text ever since the 1500s.</p>
+                                </div>
+                            </li>
+
+                            <li>
+                                <div class="time">
+                                    <!-- post date  -->
+                                    <h4 class="p_date">01 Mar 2020</h4>
+                                </div>
+                                <div class="content">
+                                    <!-- Author name  -->
+                                    <h3 class="author_name">Author Name</h3>
+                                    <!-- comment  -->
+                                    <p class="author_comment">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem
+                                        Ipsum has been the industry's standard dummy text ever since the 1500s.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- timeline END -->
+                    <div class="add-comment-box">
+                        <h4 class="title">Write Comment</h4>
+                        <form id="commentForm">
+                            <div class="form-group">
+                                <textarea type="text"  id="commentTextarea" name="" value="" placeholder="Enter Message"
+                                    class="form-control" rows="5" required=""></textarea>
+                            </div>
+                            <div class="text-end mt-3">
+                                <button class="btn btn-scolor btn-sm fw-semibold px-5 postButton" data-post-task-id="">Post</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+    <!-- Modal Write Comment End -->
 {% endblock %}
 {% block script %}
 <script>
@@ -201,7 +254,7 @@ function handleStatusChange(select) {
             // Update the task status on success
             if (response.success)
             {
-                alert(response.message)
+                console.log(response.message)
             }
             var selectedOption = select.options[select.selectedIndex];
             var newClass = "";
@@ -267,6 +320,147 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+$(document).ready(function() {
+    $('#WriteComment').on('show.bs.modal', function(e) {
+        var task_id = $(e.relatedTarget).data('task-id');
+        $('#WriteComment .add-comment-box button').attr('data-post-task-id', task_id);
+        $.ajax({
+            url: '/load_activity_log/' + task_id + '/',
+            type: 'GET',
+            success: function(response) {
+                var activity_log_data = JSON.parse(response.activity_log_data);
+                var task_data = JSON.parse(response.task_data);
+                var user_data = JSON.parse(response.user_data);
 
+                var activityLogList = $('#activity-log-list');
+                activityLogList.empty(); // Clear existing content
+
+                // Set task name in the comment_title element
+                $('#comment_title').text(task_data[0].fields.task_title);
+
+                $.each(activity_log_data, function(index, log) {
+                    var logDate = new Date(log.fields.created_date);
+                    var formattedDate = formatDate(logDate);
+                    var listItem = $('<li>');
+                    listItem.append($('<div>').addClass('time').append($('<h4>').addClass('p_date').text(formattedDate)));
+                    var contentDiv = $('<div>').addClass('content');
+                    var user = user_data.find(u => u.pk === log.fields.user);
+                    var username = user ? user.fields.username : 'Unknown User';
+                    contentDiv.append($('<h3>').addClass('author_name').text(log.fields.notification_comment));
+                    if (log.fields.notification_comment.includes("Task Added")){
+                        contentDiv.append($('<p>').addClass('author_comment').text(task_data[0].fields.task_title));
+                    }
+                    else if (log.fields.notification_comment.includes("Commented on Task")){
+                        contentDiv.append($('<p>').addClass('author_comment').text(task_data[0].fields.task_title));
+                    }
+                    listItem.append(contentDiv);
+                    activityLogList.append(listItem);
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error(error);
+            }
+        });
+    });
+/*
+$('#WriteComment').on('show.bs.modal', function(e) {
+    var task_id = $(e.relatedTarget).data('task-id');
+    $('#WriteComment .add-comment-box button').attr('data-post-task-id', task_id);
+    $.ajax({
+        url: '/load_activity_log/' + task_id + '/',
+        type: 'GET',
+        success: function(response) {
+            var activity_log_data = JSON.parse(response.activity_log_data);
+            var task_data = JSON.parse(response.task_data);
+            var user_data = JSON.parse(response.user_data);
+            var comment_data = JSON.parse(response.comment_data);  // Parse comment data
+
+            var activityLogList = $('#activity-log-list');
+            activityLogList.empty(); // Clear existing content
+
+            // Set task name in the comment_title element
+            $('#comment_title').text(task_data[0].fields.task_title);
+
+            $.each(activity_log_data, function(index, log) {
+                var logDate = new Date(log.fields.created_date);
+                var formattedDate = formatDate(logDate);
+                var listItem = $('<li>');
+                listItem.append($('<div>').addClass('time').append($('<h4>').addClass('p_date').text(formattedDate)));
+                var contentDiv = $('<div>').addClass('content');
+                var user = user_data.find(u => u.pk === log.fields.user);
+                var username = user ? user.fields.username : 'Unknown User';
+                contentDiv.append($('<h3>').addClass('author_name').text(log.fields.notification_comment));
+                
+                // Check if the notification comment is related to task actions
+                if (log.fields.notification_comment.includes("Task Added") || log.fields.notification_comment.includes("Commented on Task")) {
+                    // Append the task title as the author comment
+                    contentDiv.append($('<p>').addClass('author_comment').text(task_data[0].fields.task_title));
+                }
+                // Check if the notification comment is related to comments
+                else if (log.fields.notification_comment.includes("Commented on Task")) {
+                    // Find all comments related to this log
+                    var related_comments = comment_data.filter(c => c.fields.notification_comment === log.pk);
+                    if (related_comments.length > 0) {
+                        // Iterate through each related comment and append its text as the author comment
+                        related_comments.forEach(function(comment) {
+                            contentDiv.append($('<p>').addClass('author_comment').text(comment_data.fields.text));
+                        });
+                    }
+                }
+                
+                listItem.append(contentDiv);
+                activityLogList.append(listItem);
+            });
+        },
+        error: function(xhr, status, error) {
+            console.error(error);
+        }
+    });
+});
+*/
+    // Add event listener to the "Post" button
+$('.postButton').click(function() {
+    // Get the comment text
+    var comment = $('#commentTextarea').val();
+    
+    // Get the task_id from the button's data attribute
+    var taskId = $(this).attr('data-post-task-id');
+    
+    // Make sure comment and task_id are not empty
+    if (comment.trim() !== '' && taskId.trim() !== '') {
+        // Send comment data to the server using AJAX
+        $.ajax({
+            url: '{% url "add_comment" %}',
+            type: 'POST',
+            data: {
+                task_id: taskId,
+                comment: comment,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function(response) {
+                // Handle success response
+                console.log('Comment added successfully.');
+                $('#WriteComment').modal('show');
+            },
+            error: function(xhr, status, error) {
+                // Handle error response
+                console.error('Error:', error);
+            }
+        });
+    } else {
+        // Handle empty comment or task_id
+        console.error('Comment or task ID is empty.');
+    }
+});
+
+});
+function formatDate(dateString) {
+    var date = new Date(dateString);
+    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    var day = date.getDate();
+    var monthIndex = date.getMonth();
+    var year = date.getFullYear();
+    return day + ' ' + months[monthIndex] + ' ' + year;
+}
 </script>
 {% endblock %}

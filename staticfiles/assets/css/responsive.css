@@ -371,6 +371,10 @@
   .simple-search {
     flex-grow: 1;
   }
+  .timeline ul li:nth-child(even) .time:before {
+    left: auto;
+    right: -45px;
+  }
 }
 
 @media all and (min-width: 768px) and (max-width: 991px) {
@@ -496,9 +500,48 @@
   .logout-wrap .alert-img {
     max-width: 50px;
   }
+  .timeline ul li .time:before {
+    left: -21px;
+    width: 21px;
+  }
+  .timeline {
+    max-height: 60vh;
+    min-height: 60vh;
+  }
+  .timeline ul:before {
+    left: 20px;
+    height: 100%;
+  }
+  .timeline ul li {
+    padding-top: 0;
+  }
+  .timeline ul li:nth-child(odd),
+  .timeline ul li:nth-child(even) {
+    width: 100%;
+    text-align: left;
+    padding-left: 50px;
+    padding-bottom: 20px;
+  }
+  .timeline ul li:nth-child(odd):before,
+  .timeline ul li:nth-child(even):before {
+    top: 12px;
+    left: 16px;
+  }
+  .timeline ul li:nth-child(odd) .time,
+  .timeline ul li:nth-child(even) .time {
+    top: auto;
+    left: auto;
+    right: auto;
+    position: relative;
+    width: max-content;
+  }
+  .content {
+    padding-bottom: 10px;
+    padding-top: 10px;
+  }
 }
 @media all and (min-width: 576px) {
-  .modal-dialog {
+  .cstm-modal .modal-dialog {
     max-width: 548px;
   }
   .auth-icon-btn {

@@ -22,12 +22,14 @@ urlpatterns = [
     path('profile/', views.profile, name='profile'),
     path('chat_page/', views.chat_page, name='chat_page'),
     path('chat/<int:uid>/<int:cid>', views.chat, name='chat'),
-    path('dashbaord/', views.dashbaord, name='dashbaord'),
+    path('dashboard/', views.dashboard, name='dashboard'),
     path('progress_tracking/', views.progress_tracking, name='progress_tracking'),
     path('get_messages/', views.get_messages, name='get_messages'),
     path('send_message/', views.send_message, name='send_message'),
     path('get_task/', views.get_task, name='get_task'),
     path('update_task_status/', views.update_task_status, name='update_task_status'),
+    path('load_activity_log/<int:task_id>/', views.load_activity_log, name='load_activity_log'),
+    path('add_comment/', views.add_comment, name='add_comment'),
 
 
 
