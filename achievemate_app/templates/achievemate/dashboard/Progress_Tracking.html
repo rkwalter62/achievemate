@@ -74,13 +74,8 @@
                                 <div class="col-12">
                                     <!-- graph -->
                                     <div class="text-center">
-                                        {% comment %} <h1>Task Status Summary</h1>
-                                            <ul>
-                                                {% for status, percentage in status_percentages.items %}
-                                                    <li>{{ percentage }}</li>
-                                                {% endfor %}
-                                            </ul> {% endcomment %}
-                                        <img src="{% static 'assets/img/chart01.png' %}" alt="img/chart01.png" class="img-responsive mh-240">
+                                        <canvas id="taskChart" width="400" height="400"></canvas>
+                                        {% comment %} <img src="{% static 'assets/img/chart01.png' %}" alt="img/chart01.png" class="img-responsive mh-240"> {% endcomment %}
                                     </div>
                                 </div>
                             </div>
@@ -132,4 +127,50 @@
         <!-- main-content END -->
     </section>
     <!-- page-layout END -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var ctx = document.getElementById('taskChart').getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Remaining', 'Delayed', 'In Progress', 'Done'],
+                    datasets: [{
+                        label: 'Task Status',
+                        data: [
+                            {{ remaining_tasks }},
+                            {{ delayed_tasks }},
+                            {{ in_progress_tasks }},
+                            {{ done_tasks }}
+                        ],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.5)',
+                            'rgba(54, 162, 235, 0.5)',
+                            'rgba(255, 206, 86, 0.5)',
+                            'rgba(75, 192, 192, 0.5)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    legend: {
+                        display: true,
+                        position: 'bottom'
+                    },
+                    title: {
+                        display: true,
+                        text: 'Task Status'
+                    }
+                }
+            });
+        });
+    </script>
 {% endblock %}

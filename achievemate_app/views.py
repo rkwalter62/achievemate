@@ -492,11 +492,30 @@ def progress_tracking(request):
     user_total_tasks = Tasks.objects.filter(user=request.user)
     remaining_tasks = user_total_tasks.filter(task_status='Remaining').count()
     delayed_tasks = user_total_tasks.filter(task_status='Delayed').count()
+    in_progress_tasks = user_total_tasks.filter(task_status='In Progress').count()
+    done_tasks = user_total_tasks.filter(task_status='Done').count()
+    # Calculate total number of tasks
+    total_tasks_count = user_total_tasks.count()
     
-    context.update({'remaining_tasks':remaining_tasks})
-    context.update({'delayed_tasks':delayed_tasks})
+    # Calculate percentage of each task status
+    remaining_tasks_percentage = (remaining_tasks / total_tasks_count) * 100 if total_tasks_count != 0 else 0
+    delayed_tasks_percentage = (delayed_tasks / total_tasks_count) * 100 if total_tasks_count != 0 else 0
+    in_progress_tasks_percentage = (in_progress_tasks / total_tasks_count) * 100 if total_tasks_count != 0 else 0
+    done_tasks_percentage = (done_tasks / total_tasks_count) * 100 if total_tasks_count != 0 else 0
     
-    return render(request,"achievemate/dashboard/progress_tracking.html",context)
+    # Update context with counts and percentages
+    context.update({
+        'remaining_tasks': remaining_tasks,
+        'delayed_tasks': delayed_tasks,
+        'in_progress_tasks': in_progress_tasks,
+        'done_tasks': done_tasks,
+        'remaining_tasks_percentage': remaining_tasks_percentage,
+        'delayed_tasks_percentage': delayed_tasks_percentage,
+        'in_progress_tasks_percentage': in_progress_tasks_percentage,
+        'done_tasks_percentage': done_tasks_percentage,
+    })
+    
+    return render(request,"achievemate/dashboard/Progress_Tracking.html",context)
 
 import requests
 from datetime import datetime,timedelta
