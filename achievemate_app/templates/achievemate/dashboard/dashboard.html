@@ -1,6 +1,7 @@
 {% extends "achievemate/dashboard/dashboard_base.html" %}
 {% load static %}
 {% block content %}
+{% load custom_filters %}
     <!-- page-layout Start -->
     <section class="page-layout">
         <!-- mobile_view_header Start-->
@@ -331,13 +332,13 @@ $(document).ready(function() {
                 var activity_log_data = JSON.parse(response.activity_log_data);
                 var task_data = JSON.parse(response.task_data);
                 var user_data = JSON.parse(response.user_data);
-
+                var comment_data = JSON.parse(response.comment_data);
                 var activityLogList = $('#activity-log-list');
                 activityLogList.empty(); // Clear existing content
 
                 // Set task name in the comment_title element
                 $('#comment_title').text(task_data[0].fields.task_title);
-
+                var i=0;
                 $.each(activity_log_data, function(index, log) {
                     var logDate = new Date(log.fields.created_date);
                     var formattedDate = formatDate(logDate);
@@ -351,8 +352,12 @@ $(document).ready(function() {
                         contentDiv.append($('<p>').addClass('author_comment').text(task_data[0].fields.task_title));
                     }
                     else if (log.fields.notification_comment.includes("Commented on Task")){
-                        contentDiv.append($('<p>').addClass('author_comment').text(task_data[0].fields.task_title));
+                        
+                        var taskComments = comment_data.filter(comment => comment.fields.tasks === task_id);
+                            contentDiv.append($('<p>').addClass('author_comment').text(taskComments[i].fields.text));
+                        i++;
                     }
+                    
                     listItem.append(contentDiv);
                     activityLogList.append(listItem);
                 });
@@ -362,62 +367,6 @@ $(document).ready(function() {
             }
         });
     });
-/*
-$('#WriteComment').on('show.bs.modal', function(e) {
-    var task_id = $(e.relatedTarget).data('task-id');
-    $('#WriteComment .add-comment-box button').attr('data-post-task-id', task_id);
-    $.ajax({
-        url: '/load_activity_log/' + task_id + '/',
-        type: 'GET',
-        success: function(response) {
-            var activity_log_data = JSON.parse(response.activity_log_data);
-            var task_data = JSON.parse(response.task_data);
-            var user_data = JSON.parse(response.user_data);
-            var comment_data = JSON.parse(response.comment_data);  // Parse comment data
-
-            var activityLogList = $('#activity-log-list');
-            activityLogList.empty(); // Clear existing content
-
-            // Set task name in the comment_title element
-            $('#comment_title').text(task_data[0].fields.task_title);
-
-            $.each(activity_log_data, function(index, log) {
-                var logDate = new Date(log.fields.created_date);
-                var formattedDate = formatDate(logDate);
-                var listItem = $('<li>');
-                listItem.append($('<div>').addClass('time').append($('<h4>').addClass('p_date').text(formattedDate)));
-                var contentDiv = $('<div>').addClass('content');
-                var user = user_data.find(u => u.pk === log.fields.user);
-                var username = user ? user.fields.username : 'Unknown User';
-                contentDiv.append($('<h3>').addClass('author_name').text(log.fields.notification_comment));
-                
-                // Check if the notification comment is related to task actions
-                if (log.fields.notification_comment.includes("Task Added") || log.fields.notification_comment.includes("Commented on Task")) {
-                    // Append the task title as the author comment
-                    contentDiv.append($('<p>').addClass('author_comment').text(task_data[0].fields.task_title));
-                }
-                // Check if the notification comment is related to comments
-                else if (log.fields.notification_comment.includes("Commented on Task")) {
-                    // Find all comments related to this log
-                    var related_comments = comment_data.filter(c => c.fields.notification_comment === log.pk);
-                    if (related_comments.length > 0) {
-                        // Iterate through each related comment and append its text as the author comment
-                        related_comments.forEach(function(comment) {
-                            contentDiv.append($('<p>').addClass('author_comment').text(comment_data.fields.text));
-                        });
-                    }
-                }
-                
-                listItem.append(contentDiv);
-                activityLogList.append(listItem);
-            });
-        },
-        error: function(xhr, status, error) {
-            console.error(error);
-        }
-    });
-});
-*/
     // Add event listener to the "Post" button
 $('.postButton').click(function() {
     // Get the comment text
@@ -440,7 +389,6 @@ $('.postButton').click(function() {
             success: function(response) {
                 // Handle success response
                 console.log('Comment added successfully.');
-                $('#WriteComment').modal('show');
             },
             error: function(xhr, status, error) {
                 // Handle error response

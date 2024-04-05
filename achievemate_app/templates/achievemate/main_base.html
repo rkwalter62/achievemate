@@ -482,7 +482,7 @@
           // Attach a click event handler to the button with id "btn_google_login"
           $("#btn_google_login").on("click", function() {
               // Redirect to the Google login URL
-              window.location.href = "{% provider_login_url 'google' action='reauthenticate' %}";
+              window.location.href = "{% provider_login_url 'google'  action='reauthenticate' %}";
           });
           $("#btn_google_login2").on("click", function() {
               // Redirect to the Google login URL
@@ -661,21 +661,21 @@
         });
 
         $(document).on('keyup', function(event) {
-            console.log("Key pressed: " + event.which);
-            if (event.which === 13) {
-                console.log("Enter key pressed");
-                // Determine which modal is open
-                var activeModal = $('.modal.show')[0].id;
-                
-                // Check which modal is active and click the respective button
-                if (activeModal === "UserLogin") {
-                    $('#login_button').click();
-                } else if (activeModal === "UserSignUp") {
-                    $('#signup_button').click();
-                } else if (activeModal === "ForgotPassword") {
-                    $('#reset_password_button').click();
+            if (event.which !== undefined) {
+                console.log("Key pressed: " + event.which);
+                if (event.which === 13) {
+                    console.log("Enter key pressed");
+                    var activeModal = $('.modal.show')[0].id;
+                    if (activeModal === "UserLogin") {
+                        $('#login_button').click();
+                    } else if (activeModal === "UserSignUp") {
+                        $('#signup_button').click();
+                    } else if (activeModal === "ForgotPassword") {
+                        $('#reset_password_button').click();
+                    }
                 }
             }
         });
+        
   </script>
 </html>

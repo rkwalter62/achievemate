@@ -224,9 +224,22 @@ def testimonials(request):
  
 def subscription(request):
       return render(request,"achievemate/subscription.html")
-
+@login_required
 def find_coach(request):
-      return render(request,"achievemate/find_coach.html")
+    if request.method == 'POST':
+        # Loop through the submitted data to extract answers
+        for key, value in request.POST.items():
+            if key.startswith('answer_'):
+                question_id = key.split('_')[1]
+                # Create UserAnswer object and save to the database
+                user_answer = UserAnswer.objects.create(user=request.user, question_id=question_id, answer=value)
+                user_answer.save()
+        return redirect('find_coach')  # Redirect to a success page
+    else:
+        context={}
+        questions = FindCoachQuestions.objects.all()
+        context.update({'questions' : questions})
+    return render(request,"achievemate/find_coach.html",context)
 @login_required   
 def coach(request):
     context={}
@@ -392,6 +405,19 @@ def dashboard(request):
     all_tasks_collection = []
     for one_id in all_coach_ids:
         all_tasks_coach = Tasks.objects.filter(coach_id=one_id)
+        for task in all_tasks_coach:
+            if task.due_date < timezone.now() and task.task_status != 'Delayed':
+                task.task_status = 'Delayed'
+                task.save()
+                # Create Activity_Log object
+                activity_type_label = dict(Activity_Log.ACTIVITY_TYPE_CHOICES).get('task_delayed', '')
+                activity_log = Activity_Log.objects.create(
+                    user=request.user,
+                    tasks=task,
+                    coach_id=task.coach.id,
+                    activity_type='task_delayed',
+                    notification_comment=f"You have marked {activity_type_label} for {task.coach.coach_name}"
+                )
         all_tasks_collection.append(all_tasks_coach)
     # print(all_tasks_collection)
     context = {
@@ -416,55 +442,18 @@ def load_activity_log(request, task_id):
     user_ids = list(activity_logs.values_list('user', flat=True))
     users = Users.objects.filter(id__in=user_ids)
     user_data = serializers.serialize('json', users)
-
+    comments = Task_Comments.objects.filter(tasks=task)
+    comment_data = serializers.serialize('json', comments)
     # Construct the JSON response
     response_data = {
         'activity_log_data': activity_log_data,
         'task_data': task_data,
         'user_data': user_data,
+        'comment_data': comment_data,
     }
 
     # Return the JSON response
     return JsonResponse(response_data)
-# from django.core import serializers
-# from django.http import JsonResponse
-
-# def load_activity_log(request, task_id):
-#     try:
-#         # Retrieve the task
-#         task=Tasks.objects.get(id=task_id)
-#         activity_logs= Activity_Log.objects.filter(tasks=task,user=request.user)
-        
-#         # Serialize the data for activity logs
-#         activity_log_data = serializers.serialize('json', activity_logs)
-        
-#         # Serialize the data for the task
-#         task_data = serializers.serialize('json', [task, ])
-        
-#         # Retrieve Task_Commentss related to the task
-#         Task_Commentss = Task_Comments.objects.filter(tasks=task)
-        
-#         # Serialize the data for Task_Commentss
-#         comment_data = serializers.serialize('json', Task_Commentss)
-        
-#         # Serialize the data for users related to the activity logs
-#         user_ids = list(activity_logs.values_list('user', flat=True))
-#         users = Users.objects.filter(id__in=user_ids)
-#         user_data = serializers.serialize('json', users)
-        
-#         # Construct the JSON response
-#         response_data = {
-#             'activity_log_data': activity_log_data,
-#             'task_data': task_data,
-#             'comment_data': comment_data,  # Include comment data in the response
-#             'user_data': user_data,
-#         }
-        
-#         # Return the JSON response
-#         return JsonResponse(response_data)
-#     except Tasks.DoesNotExist:
-#         # Handle case where the task does not exist
-#         return JsonResponse({'error': 'Task does not exist'}, status=404)
 
 def update_task_status(request):
     if request.method == 'POST':
@@ -498,7 +487,16 @@ def update_task_status(request):
         return JsonResponse({'error': 'Invalid request'}, status=400)
 
 def progress_tracking(request):
-    return render(request,"achievemate/dashboard/progress_tracking.html")
+    context={}
+    
+    user_total_tasks = Tasks.objects.filter(user=request.user)
+    remaining_tasks = user_total_tasks.filter(task_status='Remaining').count()
+    delayed_tasks = user_total_tasks.filter(task_status='Delayed').count()
+    
+    context.update({'remaining_tasks':remaining_tasks})
+    context.update({'delayed_tasks':delayed_tasks})
+    
+    return render(request,"achievemate/dashboard/progress_tracking.html",context)
 
 import requests
 from datetime import datetime,timedelta

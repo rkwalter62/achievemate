@@ -49,14 +49,16 @@
                                                 <div class="user-img">
                                                     <img src="{% static 'assets/img/user.png' %}" alt="img/user" />
                                                 </div>
-                                                <span class="user-name">James</span>
+                                                <span class="user-name">{% if user.is_authenticated %}{{user.username}}{% endif %}</span>
                                             </span>
                                         </li>
                                         <li class="header-logout-btn">
                                             <!-- Logout -->
-                                            <a href="index.html" class="btn">
+                                            <a href="{% url 'logout' %}" class="btn">
                                                 <span class="auth-icon"><i class="ri-logout-box-r-line"></i></span>
+                                                {% if user.is_authenticated %}
                                                 <span class="auth-text"> Logout</span>
+                                                {% endif %}
                                             </a>
                                         </li>
                                     </ul>
@@ -111,45 +113,48 @@
                                 <!-- find-coach-ques Start  -->
                                 <div class="find-coach-ques">
                                     <!-- Form  -->
-                                    <form>
-                                        <!-- ques-loop Start -->
+                                    <form id="question-form" method="post">
+                                        {% csrf_token %}
                                         <div class="ques-loop">
-                                            <div class="row">
-                                                <div class="col-12">
-                                                    <!-- ques -->
-                                                    <div class="ques">
-                                                        <p>1. What specific goals are you looking to achieve with the help of this AI coach?</p>
+                                            {% for question in questions %}
+                                            <div class="question {% if forloop.first %}active{% endif %}" id="question{{ forloop.counter }}">
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <!-- ques -->
+                                                        <div class="ques">
+                                                            <p>{{ forloop.counter }}. {{ question.question }}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <div class="form-group">
+                                                            <textarea name="answer_{{ question.id }}" class="form-control" rows="5" placeholder=""  required></textarea>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="row">
-                                                <div class="col-12">
-                                                    <div class="form-group">
-                                                        <textarea type="text" class="form-control" rows="5" placeholder="" required ></textarea>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <!-- ques-loop END -->
-                                    </form>
-                                </div>
-                                <!-- find-coach-ques END  -->
-                                <div class="find-coach-footer">
-                                    <!-- find-coach-footer-action -->
-                                    <div class="find-coach-footer-action">
-                                        <!-- page  -->
-                                        <span class="page">
-                                            <span class="current-page">1</span>/
-                                            <span class="total-page">6</span>
-                                        </span>
-                                        <!-- find-coach-footer-action-btn -->
-                                        <div class="find-coach-footer-action-btn">
-                                            <button class="btn btn-mcolor icon-btn"><i class="ri-arrow-up-s-line"></i></button>
-                                            <button class="btn btn-mcolor icon-btn"><i class="ri-arrow-down-s-line"></i></button>
-                                            <button class="btn btn-mcolor">Done</button>
+                                            {% endfor %}
                                         </div>
                                     </div>
-                                </div>
+                                    <!-- find-coach-ques END  -->
+                                    <div class="find-coach-footer">
+                                        <!-- find-coach-footer-action -->
+                                        <div class="find-coach-footer-action">
+                                            <!-- page  -->
+                                            <span class="page">
+                                                <span class="current-page">1</span>/
+                                                <span class="total-page">6</span>
+                                            </span>
+                                            <!-- find-coach-footer-action-btn -->
+                                            <div class="find-coach-footer-action-btn">
+                                                <button type="button" class="btn btn-mcolor icon-btn" id="prev-btn"><i class="ri-arrow-up-s-line"></i></button>
+                                                <button type="button" class="btn btn-mcolor icon-btn" id="next-btn"><i class="ri-arrow-down-s-line"></i></button>
+                                            </div>
+                                            <button type="submit" class="btn btn-mcolor" id="done-btn">Done</button>
+                                        </div>
+                                    </div>
+                                </form>                                                             
                             </div>
                         </div>
                     </div>
@@ -168,5 +173,42 @@
 <!-- owl.carousel -->
 <script src="{% static 'assets/js/owl.carousel.min.js' %}"></script>
 <script src="{% static 'assets/js/script.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const questions = document.querySelectorAll('.question');
+        let currentQuestionIndex = 0;
+        const currentPageSpan = document.querySelector('.current-page');
+        const totalPageSpan = document.querySelector('.total-page');
+        const doneButton = document.getElementById('done-btn');
 
+        function showQuestion(index) {
+            questions.forEach((question, idx) => {
+                if (idx === index) {
+                    question.style.display = 'block';
+                } else {
+                    question.style.display = 'none';
+                }
+            });
+            currentPageSpan.textContent = index + 1; // Update current page number
+
+            // Show/hide done button based on current question index
+            if (index === questions.length - 1) {
+                doneButton.style.display = 'block';
+            } else {
+                doneButton.style.display = 'none';
+            }
+        }
+
+        document.getElementById('prev-btn').addEventListener('click', function() {
+            currentQuestionIndex = Math.max(0, currentQuestionIndex - 1);
+            showQuestion(currentQuestionIndex);
+        });
+        document.getElementById('next-btn').addEventListener('click', function() {
+            currentQuestionIndex = Math.min(questions.length - 1, currentQuestionIndex + 1);
+            showQuestion(currentQuestionIndex);
+        });
+        totalPageSpan.textContent = questions.length; // Update total page number
+        showQuestion(currentQuestionIndex); // Initially show the first question
+    });
+</script>
 </html>
