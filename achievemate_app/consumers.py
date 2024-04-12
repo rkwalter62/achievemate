@@ -70,7 +70,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         from achievemate_app.models import Chat
         # Save the chat message to the database
         Chat.objects.create(
-            chat_text=message,
+            chat_text=repr(message),
             user_type='coach',
             user_id=self.uid,
             coach_id=self.cid
