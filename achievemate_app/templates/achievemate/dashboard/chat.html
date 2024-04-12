@@ -203,14 +203,6 @@
     {% endblock %}
     {% block script %}
     <script>
-
-        {% comment %} function scrollToBottom() {
-            var chatWindow = document.getElementByClass('chat-wrapper');
-            chatWindow.scrollTop = chatWindow.scrollHeight;
-        } {% endcomment %}
-        // WebSocket connection
-        {% comment %} const uid ="{{uid}}";
-        const cid ="{{cid}}"; {% endcomment %}
         const uid = "{{uid}}" ? "{{uid}}" : 0;
         const cid = "{{cid}}" ? "{{cid}}" : 0;
         {% comment %} console.log(uid,cid); {% endcomment %}
@@ -243,13 +235,19 @@
                     type: 'GET',
                     success: function(data) {
                         console.log("update message data -> ",data)
-                        var messages = data.messages;
+                        if (data.None=== null)
+                        {
+                            console.log("Null fetched in messages")
+                        }
+                        else{
+                            var messages = data.messages;
                         // Assuming data is an array of chat objects
                         $('#messages').empty(); // Clear previous messages
                         
                         messages.forEach(function(chat) {
                             var messageHtml;
                             //console.log("chat: ",chat)
+                            var chatMessage = chat[0].replace(/\\n/g, "<br>").replace(/\\n\\n/g, "<br><br>");
                 if (chat[1] == "user") {
                     messageHtml = `
                         <div class="usertalk-inner reply-inner">
@@ -257,7 +255,7 @@
                                 <img src="${chat[3].profilepic}" class="img-responsive">
                             </div>
                             <div class="userleft-msg">
-                                <span>${chat[0]}</span>
+                                <span style="color: navy;">${chatMessage}</span>
                                 <div class="msg-dt">
                                     <label>${chat[2]}</label>   
                                 </div>
@@ -271,7 +269,7 @@
                                 <img src="${chat[3].coach_profile_image}" class="img-responsive">
                             </div>
                             <div class="userleft-msg">
-                                <span>${chat[0]}</span>
+                                <span style="color: navy;">${chatMessage}</span>
                                 <p hidden>${chat[4]}</p>
                                 <div class="msg-dt">
                                     <label>${chat[2]}</label>
@@ -286,6 +284,9 @@
                 // Append the message to the messages container
                 $('#messages').append(messageHtml);
                         });
+                                var chatWindow = $('#messages');
+                                chatWindow.scrollTop(chatWindow[0].scrollHeight);
+                        }
                     }
                 });
             };

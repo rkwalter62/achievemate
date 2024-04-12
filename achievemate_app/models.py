@@ -118,6 +118,8 @@ class UserProfile(BaseModel):
         managed = True
         db_table = 'user_profile'
 
+    def __str__(self):
+        return str(self.firstname) + " " +str(self.lastname)
 
 class AiCoach(BaseModel):
     coach_name = models.CharField(max_length=255, blank=True, null=True)
@@ -135,6 +137,9 @@ class AiCoach(BaseModel):
     class Meta:
         managed = True
         db_table = 'ai_coach'
+    
+    def __str__(self):
+        return self.coach_expertise+" "+ self.coach_name 
 
 class Chat(BaseModel):
     USER_TYPE_CHOICES = [
@@ -150,7 +155,8 @@ class Chat(BaseModel):
         managed = True
         db_table = 'chat'
 
-
+    def __str__(self):
+        return self.chat_text
 
 class FindCoachQuestions(BaseModel):
     QUESTION_TYPE_CHOICES = [
@@ -162,6 +168,9 @@ class FindCoachQuestions(BaseModel):
     class Meta:
         managed = True
         db_table = 'find_coach_questions'
+        
+    def __str__(self):
+        return self.question
 
 class UserAnswer(BaseModel):
     user = models.ForeignKey('Users', models.DO_NOTHING, blank=True, null=True)
@@ -171,6 +180,9 @@ class UserAnswer(BaseModel):
     class Meta:
         managed = True
         db_table = 'user_answer'
+        
+    def __str__(self):
+        return self.question.question + "  Ans->"+self.answer 
 
         
 class Tasks(BaseModel):
@@ -190,6 +202,9 @@ class Tasks(BaseModel):
     class Meta:
         managed = True
         db_table = 'tasks'
+        
+    def __str__(self):
+        return self.task_title
 
 class Activity_Log(BaseModel):
     ACTIVITY_TYPE_CHOICES = [
@@ -206,6 +221,9 @@ class Activity_Log(BaseModel):
     activity_type = models.CharField(max_length=30, choices=ACTIVITY_TYPE_CHOICES,blank=True, null=True)
     notification_comment = models.TextField(max_length=255, blank=True, null=True)
     
+    def __str__(self):
+        return self.notification_comment
+    
 class Task_Comments(BaseModel):
     tasks=models.ForeignKey('Tasks',models.DO_NOTHING,blank=True,null=True)
     user = models.ForeignKey('Users', models.DO_NOTHING, blank=True, null=True)
@@ -214,3 +232,6 @@ class Task_Comments(BaseModel):
     class Meta:
         managed = True
         db_table = 'task_comments'
+        
+    def __str__(self):
+        return self.text

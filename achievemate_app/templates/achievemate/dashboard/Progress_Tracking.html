@@ -114,7 +114,8 @@
                                 <div class="col-12">
                                     <!-- graph -->
                                     <div class="text-center">
-                                        <img src="{% static 'assets/img/chart02.png' %}" alt="img/chart02.png" class="img-responsive mh-240">
+                                        <canvas id="myChart"></canvas>
+                                        {% comment %} <img src="{% static 'assets/img/chart02.png' %}" alt="img/chart02.png" class="img-responsive mh-240"> {% endcomment %}
                                     </div>
                                 </div>
                             </div>
@@ -173,4 +174,63 @@
             });
         });
     </script>
+      <script>
+        var chartData = {{ chart_data | safe }};
+        
+        // Configuration options for the chart
+        var options = {
+          indexAxis: 'x', // Display bars horizontally
+          scales: {
+            x: {
+              stacked: false, // Do not stack bars horizontally
+              title: {
+                display: true,
+                text: 'Coaches',
+                position: 'bottom' // Position label at the bottom
+              }
+            },
+            y: {
+              stacked: false, // Do not stack bars vertically
+              ticks: {
+                callback: function(value, index, values) {
+                  return value + '%'; // Add percentage symbol to each tick
+                }
+              }
+            }
+          },
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  var label = context.dataset.label || '';
+                  if (label) {
+                    label += ': ';
+                  }
+                  label += context.parsed.y + '%';
+                  return label;
+                }
+              }
+            }
+          }
+        };
+        
+        // Get the canvas element
+        var ctx = document.getElementById('myChart').getContext('2d');
+        
+        // Create the chart
+        var myChart = new Chart(ctx, {
+          type: 'bar',
+          data: chartData,
+          options: options
+        });
+        
+        // Custom legend (without labels)
+        var legend = document.createElement('div');
+        legend.style.display = 'flex';
+        legend.style.justifyContent = 'center';
+        
+        document.body.appendChild(legend);
+        
+        
+      </script>
 {% endblock %}

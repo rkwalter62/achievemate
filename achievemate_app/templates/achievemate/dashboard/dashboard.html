@@ -79,6 +79,19 @@
                                             <div class="task-data">
                                                 <span class="task-data-title">{{task.task_title|title}}</span>
                                                 <span class="task-data-time"> Due : {{task.due_date}}</span>
+                                                {% if task.due_date %}
+                                                {% with remaining_days=task.due_date|remaining_days %}
+                                                    {% if remaining_days < 0 %}
+                                                        <span style="color: red;">Past due {{  remaining_days    |absolute_value}} days</span>
+                                                    {% elif remaining_days >= 0 and remaining_days <= 4  %}
+                                                        <span style="color: green;">Need Attention</span>
+                                                    {% else %}
+                                                        <span style="color: grey;">{{ remaining_days }} days remaining</span>
+                                                    {% endif %}
+                                                {% endwith %}
+                                            {% else %}
+                                                No due date set
+                                            {% endif %}
                                             </div>
                                         </td>
                                         <td>{{task.coach.coach_name}}</td>

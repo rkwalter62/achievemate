@@ -339,7 +339,10 @@ from django.contrib.auth.decorators import login_required
 def get_messages(request):
     uid = request.GET.get('uid')
     cid = request.GET.get('cid')
-    current_coach=AiCoach.objects.get(id=cid)
+    try:
+        current_coach=AiCoach.objects.get(id=cid)
+    except:
+        return JsonResponse({'None': None})
     # Retrieve messages from the Chat model
     messages = Chat.objects.filter(is_deleted=0, user_id=uid, coach_id=cid).order_by('created_date')
     if messages.count()==0:
@@ -514,7 +517,40 @@ def progress_tracking(request):
         'in_progress_tasks_percentage': in_progress_tasks_percentage,
         'done_tasks_percentage': done_tasks_percentage,
     })
-    
+    coach_status_data = {}
+    # Fetch coach-wise tasks status percentages
+    coaches = AiCoach.objects.all()
+    for coach in coaches:
+        tasks_count = Tasks.objects.filter(coach=coach,user=request.user).values('task_status').annotate(count=Count('id'))
+        total_tasks = sum([count['count'] for count in tasks_count])
+        percentages = {status['task_status']: (status['count'] / total_tasks) * 100 for status in tasks_count}
+        coach_status_data[coach.coach_name] = percentages
+
+    # Prepare data for chart
+    labels = list(coach_status_data.keys())
+    datasets = []
+    status_colors = {
+        'Remaining': 'rgba(255,231,140,0.7)',  # Adjusted alpha value for a darker shade
+        'In Progress': 'rgba(0,149,255,0.7)',
+        'Done': 'rgba(66,189,83,0.7)',
+        'Delayed': 'rgba(255,102,102,0.7)' ,
+    }
+    for status in ['Remaining', 'In Progress', 'Done', 'Delayed']:
+        dataset = {
+            'label': status,
+            'backgroundColor': status_colors[status],
+            'data': []
+        }
+        for coach, percentages in coach_status_data.items():
+            dataset['data'].append(percentages.get(status, 0))
+        datasets.append(dataset)
+
+    # Pass data to template
+    chart_data = {
+        'labels': labels,
+        'datasets': datasets
+    }
+    context.update({'chart_data': chart_data})
     return render(request,"achievemate/dashboard/Progress_Tracking.html",context)
 
 import requests
