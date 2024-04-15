@@ -1,6 +1,7 @@
 {% extends "achievemate/dashboard/dashboard_base.html" %}
 {% load static %}
 {% block content %}
+{% load custom_filters %}
     <!-- page-layout Start -->
     <section class="page-layout">
         <!-- mobile_view_header Start-->
@@ -228,7 +229,14 @@
             updateMessages();
             //scrollToBottom();
         };
-            
+        function removeAnswerPrefix(message) {
+            if (message.startsWith("answer:")) {
+                return message.substring(7).trim();
+            } else if (message.startsWith("Answer:")) {
+                return message.substring(7).trim();
+            }
+            return message;
+        }
             function updateMessages() {
                 $.ajax({
                     url: `{% url 'get_messages' %}?uid=${parseInt(uid)}&cid=${parseInt(cid)}`,
@@ -247,7 +255,8 @@
                         messages.forEach(function(chat) {
                             var messageHtml;
                             //console.log("chat: ",chat)
-                            var chatMessage = chat[0].replace(/\\n/g, "<br>").replace(/\\n\\n/g, "<br><br>");
+                            var chatMessage = chat[0].replace(/\\n/g, "<br>").replace(/\\n\\n/g, "<br><br>").replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\\'/g, "'");
+                            chatMessage = removeAnswerPrefix(chatMessage);
                 if (chat[1] == "user") {
                     messageHtml = `
                         <div class="usertalk-inner reply-inner">
