@@ -100,7 +100,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             print("Getting data")
     # Get the value of the "answer" key
             answer = data.get('answer')
-            print("Answer is -------->",answer)
+            # print("Answer is -------->",answer)
             return answer
         elif expertise=="Health Experts":
             print("inside expertise")
@@ -119,7 +119,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             print("Getting data")
     # Get the value of the "answer" key
             answer = data.get('answer')
-            print("Answer is -------->",answer)
+            # print("Answer is -------->",answer)
             return answer
         elif expertise=="Business Idea Experts":
             print("inside expertise")
@@ -138,7 +138,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             print("Getting data")
     # Get the value of the "answer" key
             answer = data.get('answer')
-            print("Answer is -------->",answer)
+            # print("Answer is -------->",answer)
             return answer
         elif expertise=="Career Experts":
             print("inside expertise")
@@ -157,6 +157,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
             print("Getting data")
     # Get the value of the "answer" key
             answer = data.get('answer')
-            print("Answer is -------->",answer)
+            # print("Answer is -------->",answer)
             return answer
 

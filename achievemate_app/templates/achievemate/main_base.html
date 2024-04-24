@@ -154,10 +154,10 @@
                             <div class="footer-links footer-contact">
                                 <h5 class="mb-2">Contact Us</h5>
                                 <ul class="nav flex-column">
-                                    <li class="nav-item"><a href="tel:+123 400 123" class=""><i
-                                                class="ri-phone-fill"></i>Call : +123 400 123</a></li>
-                                    <li class="nav-item"><a href="mailto:example@mail.com" class=""><i
-                                                class="ri-mail-fill"></i>example@mail.com</a>
+                                    {% comment %} <li class="nav-item"><a href="tel:+123 400 123" class=""><i
+                                                class="ri-phone-fill"></i>Call : info@redsandresearch.com</a></li> {% endcomment %}
+                                    <li class="nav-item"><a href="mailto:info@redsandresearch.com" class=""><i
+                                                class="ri-mail-fill"></i>info@redsandresearch.com</a>
                                     </li>
                                     <li class="nav-item">
                                         <i class="ri-map-pin-2-fill"></i>
@@ -173,11 +173,11 @@
                                     <div class="footer-links pt-xl-4">
                                         <h5>Explore</h5>
                                         <ul class="nav flex-column">
-                                            <li class="nav-item"><a href="#" class="">Home</a></li>
-                                            <li class="nav-item"><a href="#" class="">About</a></li>
-                                            <li class="nav-item"><a href="#" class="">Course</a></li>
-                                            <li class="nav-item"><a href="#" class="">Blog</a></li>
-                                            <li class="nav-item"><a href="#" class="">Contact</a></li>
+                                            <li class="nav-item"><a href="{% url 'index' %}">Home</a></li>
+                                            <li class="nav-item"><a href="{% url 'about_us' %}">About Us</a></li>
+                                            <li class="nav-item"><a href="{% url 'our_coach' %}">Our Coaches</a></li>
+                                            <li class="nav-item"><a href="{% url 'services' %}">Services</a></li>
+                                            <li class="nav-item"><a href="{% url 'subscription'%}">Subscription </a></li>
                                         </ul>
                                     </div>
                                 </div>
@@ -185,8 +185,7 @@
                                     <!-- Subscribe -->
                                     <div class="footer-links pt-xl-4">
                                         <h5>Subscribe</h5>
-                                        <p class="footer-desc">Lorem Ipsum has been them an industry printer took a
-                                            galley make book.</p>
+                                        <p class="footer-desc">Subscribe for daily motivation sugestions</p>
                                         <form class="footer-subscribe-form">
                                             <div class="form-group mb-3">
                                                 <input type="text" name="" value="" class="form-control"

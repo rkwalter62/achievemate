@@ -34,7 +34,10 @@ def login_required(function):
     return wrapper
 # Create your views here.
 def index(request):
-      return render(request,"achievemate/index.html")
+    context={}
+    all_coach_details=AiCoach.objects.all()
+    context.update({'all_coach_details':all_coach_details})
+    return render(request,"achievemate/index.html",context)
 
 @login_required
 def choose_coach(request):
