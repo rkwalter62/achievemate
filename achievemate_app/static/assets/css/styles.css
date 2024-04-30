@@ -413,6 +413,7 @@
   height: 100%;
   object-fit: cover;
   transition: var(--tran-04);
+  object-position: top center;
 }
 .img-wrapper:hover .img-thumbnail img {
   transform: scale(1.1);
@@ -499,7 +500,7 @@
   margin-bottom: 15px;
   margin-top: -96px;
   display: flex;
-  align-items: center;
+  /* align-items: center; */
   justify-content: center;
 }
 .testimonial-head img {

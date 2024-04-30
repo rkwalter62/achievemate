@@ -167,7 +167,12 @@
                                             </div> {% endcomment %}
                                         </div>
                                         <!-- usertalk-wrapper END -->
-
+                                        <div  id="recommendquestions" hidden>
+                                            <ul>
+                                                <!-- Loop through questions -->  
+                                                
+                                            </ul>
+                                        </div>
                                         <!-- chattype-wrapper start  -->
                                         <div class="chattype-wrapper">
                                             <div class="typeinput-wrapper">
@@ -237,6 +242,106 @@
             }
             return message;
         }
+        function extractQuestions(text) {
+            // Find the index of "recommended questions"
+            const index = text.toLowerCase().indexOf("recommended question");
+        
+            // If "recommended questions" is not found, return an empty array
+            if (index === -1) {
+                return [];
+            }
+        
+            // Get the substring after "recommended questions"
+            const questionsText = text.substring(index + "recommended question".length);
+        
+            // Split the remaining text into an array of questions
+            const questionsArray = questionsText.split(/\<br>/);
+        
+            // Remove any empty strings from the array
+            const filteredQuestionsArray = questionsArray.filter(question => question.trim() !== "" && question.trim() !== undefined);
+        
+            // Return the array of questions
+            return filteredQuestionsArray;
+        }
+          
+        // Function to render questions inside a <ul> list
+        function renderQuestions(questionsArray) {
+            // Select the parent element where the <ul> list is located
+            const chatSenderList = document.querySelector("#recommendquestions ul");
+
+            // Clear existing questions
+            chatSenderList.innerHTML = "";
+
+            // Loop through questions and create HTML markup for each question
+            questionsArray.forEach((question, index) => {
+                if (question.startsWith(":")) {
+                    question = question.substring(1).trim();
+                }
+            
+                // Condition 2: Remove numbers followed by a dot and space from the start of the question if present
+                if (/^\d+\.\s/.test(question)) {
+                    question = question.replace(/^\d+\.\s/, "");
+                }
+                if (question==="")
+                {
+                    return;
+                }
+                // Create a new <li> element for each question
+                const questionListItem = document.createElement('li');
+
+                // Add the question text to the <li> element
+                questionListItem.textContent = question;
+                questionListItem.classList.add('form-control');
+                questionListItem.classList.add('form-label');
+                questionListItem.style.fontSize = '12px';
+                questionListItem.style.color = 'navy blue';
+                questionListItem.addEventListener('click', () => {
+                    // Fill the clicked question into the textbox
+
+                    document.getElementById('message-input').value = question;
+                    
+                    // Click the send button
+                    document.getElementById('send-btn').click();
+                });
+                // Optionally, add classes or attributes to the <li> element
+                // For example, add a class to the first item
+                if (index === 0) {
+                    questionListItem.classList.add('first-item');
+                }
+
+                // Append the <li> element to the <ul> list
+                chatSenderList.appendChild(questionListItem);
+            });
+        }
+        function processChatText(chatText) {
+            // Check if the text contains "task oriented question"
+            const isTask = chatText.toLowerCase().includes("task oriented question");
+        
+            // If "task oriented question" exists, remove it
+            if (isTask) {
+                chatText = chatText.substring(chatText.indexOf("task oriented question") + "task oriented question".length);
+            }
+        
+            // Check if the text contains "recommended question"
+            const isRecommended = chatText.toLowerCase().includes("recommended question");
+        
+            // If "recommended question" exists, remove any text after it
+            if (isRecommended) {
+                chatText = chatText.substring(0, chatText.toLowerCase().indexOf("recommended question"));
+            }
+        
+            // If neither "task oriented question" nor "recommended question" is found,
+            // return the original text
+            if (!isTask && !isRecommended) {
+                return { chatMessage: chatText, isTask: false };
+            }
+        
+            // Replace escape sequences with their corresponding characters
+            chatText = chatText.replace(/\\\\n/g, "<br>").replace(/\\\\n\\\\n/g, "<br><br>").replace(/\\\*\\\*(.*?)\\\*\\\*/g, '<strong>$1</strong>').replace(/\\\\'/g, "'");
+            
+            return { chatMessage: chatText, isTask: isTask };
+        }
+        
             function updateMessages() {
                 $.ajax({
                     url: `{% url 'get_messages' %}?uid=${parseInt(uid)}&cid=${parseInt(cid)}`,
@@ -257,6 +362,13 @@
                             //console.log("chat: ",chat)
                             var chatMessage = chat[0].replace(/\\n/g, "<br>").replace(/\\n\\n/g, "<br><br>").replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\\'/g, "'");
                             chatMessage = removeAnswerPrefix(chatMessage);
+                            Questionsrecommended = extractQuestions(chatMessage);
+                            renderQuestions(Questionsrecommended);
+                            var chatTextResult = processChatText(chatMessage);
+                            // Access chatMessage and isTask from the result object
+                            chatMessage = chatTextResult.chatMessage;
+                            var processedIsTask = chatTextResult.isTask;
+                            console.log(processedIsTask,chatMessage)
                 if (chat[1] == "user") {
                     messageHtml = `
                         <div class="usertalk-inner reply-inner">
@@ -282,9 +394,7 @@
                                 <p hidden>${chat[4]}</p>
                                 <div class="msg-dt">
                                     <label>${chat[2]}</label>
-                                    <div class="action-button-list">
-                                        <button class="btn-scolor task_button" onclick="fetch_task()"><i class="ri-add-line"></i>Add to task</button>
-                                    </div>
+                                        ${processedIsTask ? '<div class="action-button-list"><button class="btn-scolor task_button" onclick="fetch_task()"><i class="ri-add-line"></i>Add to task</button></div>' : ''}
                                 </div>
                             </div>
                         </div>

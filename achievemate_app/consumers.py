@@ -102,11 +102,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
             answer = data.get('answer')
             # print("Answer is -------->",answer)
             return answer
-        elif expertise=="Health Experts":
-            print("inside expertise")
+        elif expertise=="Parenting Coach":
+            print("inside expertise Parenting Coach")
             # url = "http://127.0.0.1:5000/health_expert"
             # url = "http://3.220.247.187:9001/health_expert"
-            url = "https://api.achievemate.ai/Achievemate/health_expert"
+            url = "https://api.achievemate.ai/Achievemate/parenting_coach"
 
             payload = {'question': query}
             files=[
