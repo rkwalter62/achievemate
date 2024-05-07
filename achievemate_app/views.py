@@ -155,14 +155,27 @@ def profile(request):
         return JsonResponse({"success":True,"message":"Profile Updated Succesfully"})
     return render(request,"achievemate/dashboard/profile.html",context)
 
-
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 def login_user(request):
     if request.method == 'POST':
         usern = request.POST.get('username')
         passw= request.POST.get('password')
         
-        user = authenticate(request, username=usern, password=passw, backend='django.contrib.auth.backends.ModelBackend')
-        print(user)
+        try:
+            validate_email(usern)
+            is_email = True
+        except ValidationError:
+            is_email = False
+        print(is_email)
+        if is_email:
+            # Try to authenticate using email
+            user = authenticate(request, email=usern, password=passw, backend='achievemate_app.backends.EmailOrUsernameModelBackend')
+            print("User in email -->",user)
+        else:
+            # Try to authenticate using username
+            user = authenticate(request, username=usern, password=passw, backend='django.contrib.auth.backends.ModelBackend')
+            print("User in username -->",user)
         if user is not None:
             if user.is_verified:
                 login(request, user)
@@ -226,7 +239,13 @@ def testimonials(request):
       return render(request,"achievemate/testimonial.html")
  
 def subscription(request):
-      return render(request,"achievemate/subscription.html")
+    context = {}
+    subscriptions = Subscription.objects.all()
+    packages = SubscriptionPackage.objects.filter(subscription__in=subscriptions).distinct()
+    features = SubscriptionFeatures.objects.filter(subscription_package__in=packages).distinct()
+
+    context.update({'subscriptions': subscriptions, 'packages': packages, 'features': features})
+    return render(request,"achievemate/subscription.html",context)
 @login_required
 def find_coach(request):
     if request.method == 'POST':
@@ -351,8 +370,8 @@ def get_messages(request):
     if messages.count()==0:
         if current_coach.coach_expertise=="Life Coaching Experts":
             introductory_message=f"Welcome to Life Guidance with {current_coach.coach_name}! Here to support you on your journey towards personal growth and fulfillment. Feel free to ask any questions or share your concerns. Let's embark on this journey together."
-        elif current_coach.coach_expertise=="Health Experts":
-            introductory_message=f"Welcome to Wellness Wisdom with {current_coach.coach_name}! Ready to guide you towards a healthier lifestyle and answer your health-related questions. Let's prioritize your well-being together."
+        elif current_coach.coach_expertise=="Parenting Coach":
+            introductory_message=f"Welcome to Parenting Pathways with {current_coach.coach_name}! I'm thrilled to be your guide as you navigate the beautiful and rewarding journey of parenthood. Whether you're seeking advice on nurturing strong family bonds, managing the ups and downs of raising children, or simply looking for a supportive ear, you're in the right place. Feel free to share your questions, joys, and concerns – together, we'll navigate this adventure with compassion, understanding, and a commitment to fostering harmony and joy in your family. Let's embark on this enriching journey together, one step at a time."
         elif current_coach.coach_expertise=="Business Idea Experts":
             introductory_message=f"Welcome to Business Insight with {current_coach.coach_name}! Here to help you brainstorm innovative ideas and strategize for success in your ventures. Let's unlock your entrepreneurial potential together."
         elif current_coach.coach_expertise=="Career Experts":
@@ -635,3 +654,89 @@ def separate_tasks(text: str) -> list:
     # Remove leading and trailing whitespace and replace empty lines with hyphens
     separated_text = '\n'.join(line.strip() for line in separated_text.split('\n') if line.strip())
     return separated_text
+
+def paymentsuccess(request):
+    return render(request,"achievemate/success.html")
+ 
+def paymentfailure(request):
+    return render(request,"achievemate/cancel.html")
+    
+# views.py
+import stripe
+def create_stripe_session(request):
+    if request.method == 'POST':
+        price_id = request.POST.get('price_id')  # Assuming you pass the price_id from the frontend
+        print("Price id----->",price_id)
+        print("Http Host",request.META['HTTP_HOST'])
+        chosen_subscription=Subscription.objects.filter(id=price_id)[0]
+        print(chosen_subscription)
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+        print("api key",stripe.api_key )
+        try:
+            api_id='price_1PBbNFSEfIjrzg8BAaoEwjy1'
+            session = stripe.checkout.Session.create(
+                line_items=[{
+                    'price': chosen_subscription.stripe_price_id,
+                    'quantity': 1,
+                }],
+                mode='subscription',
+                # success_url='http://127.0.0.1:8000/paymentsuccess/',
+                # cancel_url='http://127.0.0.1:8000/paymentfailure/',
+                success_url='https://achievemate.ai//paymentsuccess/',
+                cancel_url='https://achievemate.ai//paymentfailure/',
+            )
+            print(session)
+            return JsonResponse({'sessionurl': session.url})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
+# import json
+# from django.http import JsonResponse
+# from django.views.decorators.csrf import csrf_exempt
+# import stripe
+
+# # This is your test secret API key.
+# stripe.api_key = settings.STRIPE_SECRET_KEY
+# # Replace this endpoint secret with your endpoint's unique secret
+# # If you are testing with the CLI, find the secret by running 'stripe listen'
+# # If you are using an endpoint defined with the API or dashboard, look in your webhook settings
+# # at https://dashboard.stripe.com/webhooks
+# endpoint_secret = 'whsec_...'
+
+# @csrf_exempt
+# def webhook(request):
+#     if request.method == 'POST':
+#         payload = request.body
+#         event = None
+
+#         try:
+#             event = stripe.Webhook.construct_event(
+#                 payload, request.META.get('HTTP_STRIPE_SIGNATURE'), endpoint_secret
+#             )
+#         except ValueError as e:
+#             # Invalid payload
+#             return JsonResponse({'error': str(e)}, status=400)
+#         except stripe.error.SignatureVerificationError as e:
+#             # Invalid signature
+#             return JsonResponse({'error': str(e)}, status=400)
+
+#         # Handle the event
+#         if event['type'] == 'payment_intent.succeeded':
+#             payment_intent = event['data']['object']  # contains a stripe.PaymentIntent
+#             print('Payment for {} succeeded'.format(payment_intent['amount']))
+#             # Then define and call a method to handle the successful payment intent.
+#             # handle_payment_intent_succeeded(payment_intent)
+#         elif event['type'] == 'payment_method.attached':
+#             payment_method = event['data']['object']  # contains a stripe.PaymentMethod
+#             # Then define and call a method to handle the successful attachment of a PaymentMethod.
+#             # handle_payment_method_attached(payment_method)
+#         else:
+#             # Unexpected event type
+#             print('Unhandled event type {}'.format(event['type']))
+
+#         return JsonResponse({'success': True})
+#     else:
+#         return JsonResponse({'error': 'Invalid request method'}, status=405)

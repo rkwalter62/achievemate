@@ -30,6 +30,10 @@ urlpatterns = [
     path('update_task_status/', views.update_task_status, name='update_task_status'),
     path('load_activity_log/<int:task_id>/', views.load_activity_log, name='load_activity_log'),
     path('add_comment/', views.add_comment, name='add_comment'),
+    path('create_stripe_session/', views.create_stripe_session, name='create_stripe_session'),
+    path('paymentsuccess/', views.paymentsuccess, name='paymentsuccess'),
+    path('paymentfailure/', views.paymentfailure, name='paymentfailure'),
+    # path('webhook/', views.webhook, name='webhook'),
 
 
 

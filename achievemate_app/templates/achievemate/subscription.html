@@ -28,42 +28,44 @@
         <section class="subscription-section">
             <div class="container">
                 <div class="row row-cols-lg-3 row-cols-md-3 row-cols-sm-2 row-cols-1 g-3">
+                    {% for package in packages %}
                     <div class="col">
                         <!-- Subscription Wrap Start -->
                         <div class="subscription-wrap">
                             <div class="subscription-content">
                                 <!-- subscription-header -->
                                 <div class="subscription-header">
-                                    <span class="subscription-plan">Starter Plan</span>
+                                    <span class="subscription-plan">{{ package.package_name }}</span>
                                     <!-- subscription-title -->
-                                    <h3 class="subscription-title">$11<sub>/ month</sub></h3>
+                                    {% for subscription in subscriptions %}
+                                    {% if subscription.subscription_package == package %}
+                                    <h3 class="subscription-title">${{ subscription.price }}<sub>/ {{ subscription.duration }} month</sub></h3><br>
+                                    {% endif %}
+                                    {% endfor %}
                                 </div>
                                 <div class="subscription-body">
                                     <!-- plan-list -->
                                     <div class="plan-list">
                                         <ul>
-                                            <!-- Loop Start  -->
+                                            {% for feature in features %}
+                                            {% if feature.subscription_package == package %}
                                             <li>
                                                 <i class="ri-check-fill"></i>
-                                                20,000 Visitors
+                                                {{ feature.feature_name }}
                                             </li>
-                                            <!-- Loop END  -->
-                                            <li>
-                                                <i class="ri-check-fill"></i>
-                                                Create Unlimited Widgets
-                                            </li>
-                                            <li>
-                                                <i class="ri-check-fill"></i>
-                                                CMS Integration
-                                            </li>
-                                            <li>
-                                                <i class="ri-check-fill"></i>
-                                                All Widget Types
-                                            </li>
+                                            {% endif %}
+                                            {% endfor %}
                                         </ul>
                                     </div>
                                 </div>
                             </div>
+                            {% for subscription in subscriptions %}
+                            {% if subscription.subscription_package == package %}
+                            <div class="subscription-footer">
+                                <button role="button" class="btn btn-mcolor w-100" onclick="redirectToStripe('{{ subscription.id }}')">${{ subscription.price }} for {{ subscription.duration }} months</button>
+                            </div>
+                            {% endif %}
+                            {% endfor %}
                             <!-- subscription-footer Button -->
                             <div class="subscription-footer">
                                 <button role="button" class="btn btn-mcolor w-100">Create a free account </button>
@@ -71,107 +73,35 @@
                         </div>
                         <!-- Subscription Wrap End -->
                     </div>
-                    <div class="col">
-                        <!-- Subscription Wrap Start -->
-                        <div class="subscription-wrap">
-                            <div class="subscription-content">
-                                <!-- subscription-header -->
-                                <div class="subscription-header">
-                                    <span class="subscription-plan">Starter Plan</span>
-                                    <!-- subscription-title -->
-                                    <h3 class="subscription-title">$35<sub>/ month</sub></h3>
-                                </div>
-                                <div class="subscription-body">
-                                    <!-- plan-list -->
-                                    <div class="plan-list">
-                                        <ul>
-                                            <!-- Loop Start  -->
-                                            <li>
-                                                <i class="ri-check-fill"></i>
-                                                50,000 Visitors
-                                            </li>
-                                            <!-- Loop END  -->
-                                            <li>
-                                                <i class="ri-check-fill"></i>
-                                                Create Unlimited Widgets
-                                            </li>
-                                            <li>
-                                                <i class="ri-check-fill"></i>
-                                                CMS Integration
-                                            </li>
-                                            <li>
-                                                <i class="ri-check-fill"></i>
-                                                All Widget Types
-                                            </li>
-                                            <li>
-                                                <i class="ri-check-fill"></i>
-                                                Integrations
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- subscription-footer Button -->
-                            <div class="subscription-footer">
-                                <button role="button" class="btn btn-mcolor w-100">Create a free account </button>
-                            </div>
-                        </div>
-                        <!-- Subscription Wrap End -->
-                    </div>
-                    <div class="col">
-                        <!-- Subscription Wrap Start -->
-                        <div class="subscription-wrap is-selected">
-                            <div class="subscription-content">
-                                <!-- subscription-header -->
-                                <div class="subscription-header">
-                                    <span class="subscription-plan">Starter Plan</span>
-                                    <!-- subscription-title -->
-                                    <h3 class="subscription-title">$11<sub>/ month</sub></h3>
-                                </div>
-                                <div class="subscription-body">
-                                    <!-- plan-list -->
-                                    <div class="plan-list">
-                                        <ul>
-                                            <!-- Loop Start  -->
-                                            <li>
-                                                <i class="ri-check-fill"></i>
-                                                20,000 Visitors
-                                            </li>
-                                            <!-- Loop END  -->
-                                            <li>
-                                                <i class="ri-check-fill"></i>
-                                                Create Unlimited Widgets
-                                            </li>
-                                            <li>
-                                                <i class="ri-check-fill"></i>
-                                                CMS Integration
-                                            </li>
-                                            <li>
-                                                <i class="ri-check-fill"></i>
-                                                All Widget Types
-                                            </li>
-                                            <li>
-                                                <i class="ri-check-fill"></i>
-                                                Integrations
-                                            </li>
-                                            <li>
-                                                <i class="ri-check-fill"></i>
-                                                Dedicated Manager
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- subscription-footer Button -->
-                            <div class="subscription-footer">
-                                <button role="button" class="btn btn-mcolor w-100">Create a free account </button>
-                            </div>
-                        </div>
-                        <!-- Subscription Wrap End -->
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </section>
         <!-- subscription-section END -->
-
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+            function redirectToStripe(priceId) {
+                console.log(priceId)
+                let csr = $("input[name=csrfmiddlewaretoken]").val();
+                // Construct data object
+                var formData = {
+                    'price_id': priceId,
+                    'csrfmiddlewaretoken': csr
+                };
+                $.ajax({
+                    method: "POST",
+                    url: "{% url 'create_stripe_session' %}",  
+                    data: formData,
+                    success: function(data) {
+                        console.log(data)
+                        // Redirect the user to the Stripe checkout page
+                        window.location.href = `${data.sessionurl}`;
+                    },
+                    error: function(xhr, textStatus, errorThrown) {
+                        console.error('Error:', errorThrown);
+                    }
+                });
+            }
+        </script>
+        
 {% endblock%}

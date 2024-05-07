@@ -168,6 +168,7 @@ AUTHENTICATION_BACKENDS = [
 
     # `allauth` specific authentication methods, such as login by email
     'allauth.account.auth_backends.AuthenticationBackend',
+    'achievemate_app.backends.EmailOrUsernameModelBackend',
 ]
 
 SITE_ID=1
@@ -234,3 +235,5 @@ CHANNEL_LAYERS = {
 #     },
 # }
 
+STRIPE_PUBLIC_KEY=os.environ.get('STRIPE_PUBLIC_KEY')
+STRIPE_SECRET_KEY=os.environ.get('STRIPE_SECRET_KEY')
