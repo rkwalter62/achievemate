@@ -15,7 +15,13 @@ deploy:
 
   script:
     - ls -lha && echo "Update code and restart Service"
-    - ssh -i SSH_PRIVATE_KEY ${USERNAME}@${Server_IP} "pwd && cd /var/www/html/AI_Extert && sudo service nginx stop && sudo service gunicorn stop && sudo service daphne stop && git pull && sudo service gunicorn restart && sudo service daphne restart && sudo service nginx restart && echo 'nginx service' && systemctl is-active nginx && echo 'gunicorn service' && systemctl is-active gunicorn && echo 'daphne service' && systemctl is-active daphne && exit"
-
+    - |
+      CHANGED=$(ssh -i SSH_PRIVATE_KEY ${USERNAME}@${Server_IP} "cd /var/www/html/AI_Extert && git diff --quiet HEAD requirements.txt || echo 'yes'")
+      if [ "$CHANGED" == "yes" ]; then
+        ssh -i SSH_PRIVATE_KEY ${USERNAME}@${Server_IP} "cd /var/www/html/AI_Extert && sudo service nginx stop && sudo service gunicorn stop && sudo service daphne stop && git pull && source venv/bin/activate && pip3 install -r requirements.txt && sudo service gunicorn restart && sudo service daphne restart && sudo service nginx restart && echo 'nginx service' && systemctl is-active nginx && echo 'gunicorn service' && systemctl is-active gunicorn && echo 'daphne service' && systemctl is-active daphne && exit"
+      else
+        ssh -i SSH_PRIVATE_KEY ${USERNAME}@${Server_IP} "cd /var/www/html/AI_Extert && sudo service nginx stop && sudo service gunicorn stop && sudo service daphne stop && git pull && sudo service gunicorn restart && sudo service daphne restart && sudo service nginx restart && echo 'nginx service' && systemctl is-active nginx && echo 'gunicorn service' && systemctl is-active gunicorn && echo 'daphne service' && systemctl is-active daphne && exit"
+      fi
+      
   only:
     - master
