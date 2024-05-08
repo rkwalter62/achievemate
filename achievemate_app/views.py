@@ -682,8 +682,8 @@ def create_stripe_session(request):
                 mode='subscription',
                 # success_url='http://127.0.0.1:8000/paymentsuccess/',
                 # cancel_url='http://127.0.0.1:8000/paymentfailure/',
-                success_url='https://achievemate.ai//paymentsuccess/',
-                cancel_url='https://achievemate.ai//paymentfailure/',
+                success_url='https://achievemate.ai/paymentsuccess/',
+                cancel_url='https://achievemate.ai/paymentfailure/',
             )
             print(session)
             return JsonResponse({'sessionurl': session.url})
