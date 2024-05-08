@@ -672,23 +672,22 @@ def create_stripe_session(request):
         print(chosen_subscription)
         stripe.api_key = settings.STRIPE_SECRET_KEY
         print("api key",stripe.api_key )
-        # try:
-        api_id='price_1PBbNFSEfIjrzg8BAaoEwjy1'
-        session = stripe.checkout.Session.create(
-            line_items=[{
-                'price': chosen_subscription.stripe_price_id,
-                'quantity': 1,
-            }],
-            mode='subscription',
-            # success_url='http://127.0.0.1:8000/paymentsuccess/',
-            # cancel_url='http://127.0.0.1:8000/paymentfailure/',
-            success_url='https://achievemate.ai/paymentsuccess/',
-            cancel_url='https://achievemate.ai/paymentfailure/',
-        )
-        # print(session)
-        return JsonResponse({'sessionurl': session.url})
-        # except Exception as e:
-        return JsonResponse({'error': str(e)}, status=400)
+        try:
+            session = stripe.checkout.Session.create(
+                line_items=[{
+                    'price': chosen_subscription.stripe_price_id,
+                    'quantity': 1,
+                }],
+                mode='subscription',
+                # success_url='http://127.0.0.1:8000/paymentsuccess/',
+                # cancel_url='http://127.0.0.1:8000/paymentfailure/',
+                success_url='https://achievemate.ai/paymentsuccess/',
+                cancel_url='https://achievemate.ai/paymentfailure/',
+            )
+            print(session)
+            return JsonResponse({'sessionurl': session.url})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
