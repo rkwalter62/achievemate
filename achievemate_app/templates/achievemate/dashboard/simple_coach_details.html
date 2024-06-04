@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+{% load static %}
+{% load custom_filters %}
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AchieveMate</title>
+    <!-- <link rel="stylesheet" href="css/style.css' %}"> -->
+    <!-- bootstrap css -->
+    <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/shortcode.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/responsive.css' %}">
+    <!-- remixicon css -->
+    <link rel="stylesheet" href="{% static 'assets/css/remixicon.css' %}">
+</head>
+
+<body>
+    
+    <!-- Sidebar STart -->
+<nav class="sidebar">
+        <!-- logo -->
+        <div class="logo-wrapper">
+            <div class="navbar-brand">
+                <a class="" href="{% url 'index' %}">
+                    <img src="{% static 'assets/img/logo.svg' %}" alt="logo.svg' %}" class="main-logo" />
+                </a>
+            </div>
+        </div>
+        <!-- toggle -->
+        <!-- menu-bar -->
+        <div class="menu-bar">
+            <div id="sidebar-menu" class="menu">
+                <!-- menu-links -->
+                <div class="menu-links">
+                    <!-- menu-list -->
+                    <div class="menu-list">
+                        <ul class="menu-list-item">
+                            <!-- Dashboard -->
+                            <li class="nav-link"><!-- add active class on click -->
+                                <a href="{% url 'index' %}">
+                                    <span class="nav-link-icon">
+                                        <img src="{% static 'assets/img/icon/svg/sidebar/dashboard.svg' %}"
+                                            alt="icon/svg/sidebar/dashboard">
+                                    </span>
+                                    <span class="text nav-text">Home</span>
+                                </a>
+                            </li>
+                            <!-- Coach  -->
+                            <li class="nav-link">
+                                <a href="{% url 'about_us' %}">
+                                    <span class="nav-link-icon">
+                                        <img src="{% static 'assets/img/icon/svg/sidebar/coach.svg' %}"
+                                            alt="icon/svg/sidebar/coach">
+                                    </span>
+                                    <span class="text nav-text">About Us </span>
+                                </a>
+                            </li>
+                            <!-- Chat  -->
+                            <li class="nav-link">
+                                <a href="{% url 'our_coach' %}">
+                                    <span class="nav-link-icon">
+                                        <img src="{% static 'assets/img/icon/svg/sidebar/chat.svg' %}" alt="icon/svg/sidebar/chat">
+                                    </span>
+                                    <span class="text nav-text">Our Coaches </span>
+                                </a>
+                            </li>
+                            <!-- Progress Tracking  -->
+                            <li class="nav-link">
+                                <a href="{% url 'services' %}" class="">
+                                    <span class="nav-link-icon">
+                                        <img src="{% static 'assets/img/icon/svg/sidebar/Progress_Tracking.svg' %}"
+                                            alt="icon/svg/sidebar/Progress_Tracking">
+                                    </span>
+                                    <span class="text nav-text">Services </span>
+                                </a>
+                            </li>
+                            <!-- Profile  -->
+                            <li class="nav-link">
+                                <a href="{% url 'subscription'%}">
+                                    <span class="nav-link-icon">
+                                        <img src="{% static 'assets/img/icon/svg/sidebar/profile.svg' %}"
+                                            alt="icon/svg/sidebar/profile">
+                                    </span>
+                                    <span class="text nav-text">Subscription </span>
+                                </a>
+                            </li>
+                        </ul>
+                        <!-- Logout -->
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav> 
+    <!-- Sidebar END -->
+
+    <section class="page-layout">
+      <!-- mobile_view_header Start-->
+      <header class="header mobile_view_header">
+          <div class="container-fluid">
+              <div class="nav-main">
+                  <div class="logo-wrapper">
+                      <div class="navbar-brand">
+                          <a class="" href="{% url 'our_coach'%}">
+                              <img src="{% static 'assets/img/logo.svg' %}" alt="logo">
+                          </a>
+                      </div>
+                  </div>
+                  <!-- minimize_toggle -->
+                  <div class="header-wrapper">
+                      <span class="minimize_toggle">
+                          <i class="ri-arrow-right-s-line"></i>
+                      </span>
+                  </div>
+              </div>
+          </div>
+      </header>
+      <!-- mobile_view_header END-->
+
+      <!-- page-topbar Start -->
+      <div class="page-topbar">
+          <div class="conteiner-fluid">
+              <div class="row align-items-center">
+                  <div class="col-12">
+                      <!-- breadcrumb -->
+                      <div class="breadcrumb-wrap">
+                          {% comment %} <nav aria-label="breadcrumb">
+                              <ul class="breadcrumb">
+                                  <li class="breadcrumb-item">Pages</li>
+                                  <li class="breadcrumb-item" aria-current="page">Select Coach</li>
+                              </ul>
+                          </nav> {% endcomment %}
+                          <!-- page-title -->
+                          <div class="page-title">
+                              <h2> <a href="{% url 'our_coach'%}"><i class="ri-arrow-left-line"></i></a> Coach Deatils</h2>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+      <!-- page-topbar END -->
+
+      <!-- main-content start  -->
+      <div class="main-content">
+          <div class="row">
+              <div class="col-12">
+                  <!-- c_detail_page Start -->
+                  <div class="c_detail_page">
+                      <!-- c_detail-head Start -->
+                      <div class="c_detail_head">
+                          <div class="row">
+                              <div class="col-12">
+                                  <!-- c_detail_head_card -->
+                                  <div class="c_detail_head_card">
+                                      <!-- c_detail_img -->
+                                      <div class="c_detail_img">
+                                          <img src="{{coach_data.coach_profile_image.url}}" alt="img/coach/coach-01" />
+                                      </div>
+                                      <div class="c_detail_content">
+                                          <div class="c_detail_content_main">
+                                              <!-- c_name -->
+                                              <h5 class="c_name">{{coach_data.coach_name}}</h5>
+                                              <!-- c_detail_skill_list -->
+                                              <ul class="c_detail_skill_list">
+                                                  <li>
+                                                      {% comment %} Health Expart {% endcomment %}
+                                                      {{single_coach.coach_expertise}}
+                                                  </li>
+                                                  {{coach_data.specialities|comma_to_li|safe }}
+                                                  {% comment %} <li>
+                                                      Groups and Teams
+                                                  </li>
+                                                  <li>
+                                                      Health and Wellness
+                                                  </li>
+                                                  <li>
+                                                      Interpersonal Relationships
+                                                  </li>
+                                                  <li>
+                                                      Personal Growth
+                                                  </li>
+                                                  <li>
+                                                      High potentials
+                                                  </li> {% endcomment %}
+                                              </ul>
+                                              <div class="c_detail_expe">
+                                                  <img src="{% static 'assets/img/icon/svg/exp.svg' %}" alt="icon/svg/exp" />
+                                                  <!-- c_detail_expe_desc -->
+                                                  <p class="c_detail_expe_desc">
+                                                      <strong>{{coach_data.coach_experience}}</strong>
+                                                      <span>Years of Experience</span>
+                                                  </p>
+                                              </div>
+                                          </div>
+                                      </div> 
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <!-- c_detail-head END -->
+
+                      <!-- c_detail_body Start  -->
+                      <div class="c_detail_body">
+                          <div class="row">
+                              <div class="col-12">
+                                  <!-- section-title -->
+                                  <div class="section-title mb-4">
+                                      <h4>About</h4>
+                                  </div>
+                                  <!-- c_detail_text  -->
+                                  <div class="c_detail_text">
+                                      <p>
+                                          {{coach_data.coach_about}}
+                                      </p>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <!-- c_detail_body END  -->
+
+                      <!-- c_detail_footer Start  -->
+                      <div class="c_detail_footer">
+                          <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-3 row-cols-xl-4 g-4">
+                              <!-- COACHING TYPES -->
+                              <div class="col">
+                                  <!-- c_more_detail_box -->
+                                  <div class="c_more_detail_box">
+                                      <h5 class="title">COACHING TYPES</h5>
+                                      <ul>
+                                          {{coach_data.coaching_types|comma_to_li|safe }}
+                                          {% comment %} <li>Health and Wellness Coach</li>
+                                          <li>Fitness Coach</li>
+                                          <li>MobilNutritionist / Dietitiane department</li>
+                                          <li>Physical Therapist</li>
+                                          <li>Nutrition Coach</li> {% endcomment %}
+                                      </ul>
+                                  </div>
+                              </div>
+                              <!-- TARGET AUDIENCE -->
+                              <div class="col">
+                                  <!-- c_more_detail_box -->
+                                  <div class="c_more_detail_box">
+                                      <h5 class="title">TARGET AUDIENCE</h5>
+                                      <ul>
+                                          {{coach_data.target_audience|comma_to_li|safe }}
+                                          {% comment %} <li>CEO/C-Suite</li>
+                                          <li>Director</li>
+                                          <li>VP-EVP</li>
+                                          <li>Entrepreneurs</li>
+                                          <li>Business Owners</li> {% endcomment %}
+                                      </ul>
+                                  </div>
+                              </div>
+                              <!-- SPECIALTIES -->
+                              <div class="col">
+                                  <!-- c_more_detail_box -->
+                                  <div class="c_more_detail_box">
+                                      <h5 class="title">SPECIALTIES</h5>
+                                      <ul>
+                                          {{coach_data.specialities|comma_to_li|safe }}
+                                          {% comment %} <li>Coaching and Mentoring</li>
+                                          <li>Change Management</li>
+                                          <li>Conflict Resolution</li>
+                                          <li>Leadership Development</li>
+                                          <li>Team Effectiveness</li> {% endcomment %}
+                                      </ul>
+                                  </div>
+                              </div>
+                              <!-- LANGUAGES -->
+                              <div class="col">
+                                  <!-- c_more_detail_box -->
+                                  <div class="c_more_detail_box">
+                                      <h5 class="title">LANGUAGES</h5>
+                                      <ul>
+                                          {{coach_data.languages|comma_to_li|safe }}
+                                          {% comment %} <li>English</li>
+                                          <li>Hindi</li>
+                                          <li>French</li> {% endcomment %}
+                                      </ul>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <!-- c_detail_footer END  -->
+                  </div>
+                  <!-- c_detail_page END -->
+              </div>
+          </div>
+      </div>
+      <!-- main-content END -->
+  </section>
+  <!-- page-layout END -->
+
+
+
+
+</body>
+<!-- script -->
+<script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'assets/js/jquery.min.js' %}"></script>
+<script src="{% static 'assets/js/script.js' %}"></script>
+<script src="{% static 'assets/js/owl.carousel.min.js' %}"></script>
+{% block script %}
+{% endblock %}
+</html> 

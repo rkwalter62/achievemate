@@ -32,7 +32,7 @@
                     {% for single_coach in all_coach_details %}
                     <div class="col">
                         <!-- img-wrapper -->
-                        <div class="img-wrapper">
+                        <div class="img-wrapper" onclick="openCoachDetails({{ single_coach.id }})">
                             <!-- img-thumbnail -->
                             <div class="img-thumbnail">
                                 <img src="{{single_coach.coach_profile_image.url}}" alt="coach/coach-01" />
@@ -234,4 +234,12 @@
             </div>
         </section>
         <!-- about-section END -->
+        <script>
+            function openCoachDetails(coachId) {
+                // Construct the URL dynamically with the coach_id
+                var url = "{% url 'simple_coach_details' pk=0 %}".replace("0", coachId);
+                // Redirect to the constructed URL
+                window.location.href = url;
+            }
+        </script>
 {% endblock %}

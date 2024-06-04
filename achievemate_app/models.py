@@ -236,3 +236,34 @@ class Task_Comments(BaseModel):
         
     def __str__(self):
         return self.text
+    
+class SubscriptionPurchase(BaseModel):
+    user = models.ForeignKey('Users', models.DO_NOTHING, blank=True, null=True)    
+    plan = models.ForeignKey('Subscription', on_delete=models.DO_NOTHING, blank=True, null=True)
+    start_date = models.DateField(blank=True, null=True)
+    end_date = models.DateField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.user}'s Subscription"
+    
+class Payment(BaseModel):
+    PAYMENTSTATUSCHOICES=[
+        ('Pending','Pending'),
+        ('Success','Success'),
+        ('Failed','Failed'),
+        ]
+
+    user = models.ForeignKey('Users', models.DO_NOTHING, blank=True, null=True)   
+    amount = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    payment_date = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    status = models.CharField(max_length=20, choices=PAYMENTSTATUSCHOICES, default="Pending", blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.user}'s Payment"
+    
+    
+class UserStripe(BaseModel):
+    stripe_customer_id=models.CharField(max_length=255, blank=True, null=True)
+    user=models.ForeignKey('Users', models.DO_NOTHING, blank=True, null=True)  
+    plan = models.CharField(max_length=50, blank=True, null=True)
+    is_active = models.IntegerField(blank=True, null=True)

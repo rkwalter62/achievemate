@@ -156,8 +156,8 @@ AUTH_USER_MODEL = 'achievemate_app.Users'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'narolatest92@gmail.com'
-EMAIL_HOST_PASSWORD = 'okii idjf alja nphz'
+EMAIL_HOST_USER = 'achievemate01@gmail.com'
+EMAIL_HOST_PASSWORD = 'wrnz xmhq lnke dtmi'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False

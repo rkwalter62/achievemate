@@ -24,17 +24,18 @@
                                         <!-- banner-content -->
                                         <div class="banner-content text-center text-lg-start mb-3">
                                             <!-- banner Title -->
-                                            <h2>Give yourself new opportunities each day.</h2>
+                                            <h2>Transform Your Life with Our Premier Coaching Services</h2>
                                             <!-- banner Desc -->
-                                            <p>With <strong>AchieveMate</strong> , we believe in the power of
-                                                self-discovery and
-                                                personal growth. Our mission is to guide you on a transformative journey
-                                                towards
-                                                unlocking your full potential and living a life aligned with your
-                                                deepest aspirations.
+                                            <p>
+                                                <strong>Ignite Your Passion</strong>,
+                                                <strong>Master Parenting with Ease</strong>,
+                                                <strong>Digital Mastery for Families</strong>,
+                                                <strong>Achieve Seamless Work-Life Balance</strong>,
+                                                <strong>Tailored Transformation Journeys</strong>,
+                                                <strong>Are You Ready to Transform?</strong>
                                             </p>
                                             <!-- btn  -->
-                                            <a href="#" class="btn btn-scolor">Find Your Coach</a>
+                                            <a href="{% url 'our_coach' %}" class="btn btn-scolor">Find Your Coach</a>
                                         </div>
                                     </div>
                                 </div>
@@ -56,17 +57,24 @@
                                         <!-- banner-content -->
                                         <div class="banner-content text-center text-lg-start mb-3">
                                             <!-- banner Title -->
-                                            <h2>Give yourself new opportunities each day.</h2>
+                                            <h2>Discover the Path to Your Ideal Career.</h2>
                                             <!-- banner Desc -->
-                                            <p>With <strong>AchieveMate</strong> , we believe in the power of
+                                            {% comment %} <p>With <strong>AchieveMate</strong> , we believe in the power of
                                                 self-discovery and
                                                 personal growth. Our mission is to guide you on a transformative journey
                                                 towards
                                                 unlocking your full potential and living a life aligned with your
-                                                deepest aspirations.
+                                                deepest aspirations. {% endcomment %}
+                                                <p>
+                                                <strong>Live Authentically</strong>,
+                                                <strong>Reach Your Full Potential</strong>,
+                                                <strong>Build on Your Strengths</strong>,
+                                                <strong>Stable Transition</strong>,
+                                                <strong>Long-Term Growth</strong>,
+                                                <strong>Begin Your Journey Today</strong>
                                             </p>
                                             <!-- btn  -->
-                                            <a href="#" class="btn btn-scolor">Find Your Coach</a>
+                                            <a href="{% url 'our_coach' %}" class="btn btn-scolor">Find Your Coach</a>
                                         </div>
                                     </div>
                                 </div>
@@ -86,17 +94,19 @@
                                         <!-- banner-content -->
                                         <div class="banner-content text-center text-lg-start mb-3">
                                             <!-- banner Title -->
-                                            <h2>Give yourself new opportunities each day.</h2>
+                                            <h2>Unlock Your Extraordinary Potential.</h2>
                                             <!-- banner Desc -->
-                                            <p>With <strong>AchieveMate</strong> , we believe in the power of
-                                                self-discovery and
-                                                personal growth. Our mission is to guide you on a transformative journey
-                                                towards
-                                                unlocking your full potential and living a life aligned with your
-                                                deepest aspirations.
+                                            <p>
+                                                <strong>Break Free from Stagnation</strong>,
+                                                <strong>Make Dreams Reality</strong>,
+                                                <strong>Elevate Your Existence</strong>,
+                                                <strong>Conquer Any Obstacle</strong>,
+                                                <strong>Accelerate Success</strong>,
+                                                <strong>Step Into Your Enlightened, Extraordinary Life</strong>
                                             </p>
+                                            
                                             <!-- btn  -->
-                                            <a href="#" class="btn btn-scolor">Find Your Coach</a>
+                                            <a href="{% url 'our_coach' %}" class="btn btn-scolor">Find Your Coach</a>
                                         </div>
                                     </div>
                                 </div>
@@ -159,7 +169,7 @@
                                     easy for you to get started. Here's a step-by-step guide on how it works.</p>
                                 <p>Explore our Ai coaching programs, connect with a coach, and take the first step
                                     towards a brighter future with <strong>AchieveMate</strong>.</p>
-                                <a href="#" class="btn btn-scolor mt-4">Find Your Coach</a>
+                                <a href="{% url 'our_coach' %}" class="btn btn-scolor mt-4">Find Your Coach</a>
                             </div>
                         </div>
                     </div>
@@ -230,7 +240,7 @@
                     {% for single_coach in all_coach_details %}
                     <div class="col">
                         <!-- img-wrapper -->
-                        <div class="img-wrapper">
+                        <div class="img-wrapper" onclick="openCoachDetails({{ single_coach.id }})">
                             <!-- img-thumbnail -->
                             <div class="img-thumbnail">
                                 <img src="{{single_coach.coach_profile_image.url}}" alt="coach/coach-01" />
@@ -331,6 +341,13 @@
             </div>
         </section>
         <!-- about-section END -->
-
+        <script>
+            function openCoachDetails(coachId) {
+                // Construct the URL dynamically with the coach_id
+                var url = "{% url 'simple_coach_details' pk=0 %}".replace("0", coachId);
+                // Redirect to the constructed URL
+                window.location.href = url;
+            }
+        </script>
 
         {% endblock %}

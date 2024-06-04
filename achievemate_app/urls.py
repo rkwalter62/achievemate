@@ -33,7 +33,8 @@ urlpatterns = [
     path('create_stripe_session/', views.create_stripe_session, name='create_stripe_session'),
     path('paymentsuccess/', views.paymentsuccess, name='paymentsuccess'),
     path('paymentfailure/', views.paymentfailure, name='paymentfailure'),
-    # path('webhook/', views.webhook, name='webhook'),
+    path('webhook/', views.webhook, name='webhook'),
+    path('simple_coach_details/<int:pk>', views.simple_coach_details, name='simple_coach_details'),
 
 
 

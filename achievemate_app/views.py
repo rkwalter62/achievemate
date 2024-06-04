@@ -37,6 +37,9 @@ def index(request):
     context={}
     all_coach_details=AiCoach.objects.all()
     context.update({'all_coach_details':all_coach_details})
+    print("Session details=> ",dict(request.session))
+    auth_user_id = request.session.get('_auth_user_id')  # Fetch _auth_user_id from session details
+    print("_auth_user_id:", auth_user_id)
     return render(request,"achievemate/index.html",context)
 
 @login_required
@@ -181,7 +184,7 @@ def login_user(request):
                 login(request, user)
                 return JsonResponse({"success":True})  # Redirect to homepage after successful login
             else:
-               return JsonResponse({'error': 'Account is Inactivated , Please activate your account verifying link sent in you mail'})  # Render account inactive template
+               return JsonResponse({'error': 'external_account is Inactivated , Please activate your account verifying link sent in you mail'})  # Render account inactive template
         else:
             return JsonResponse({'error': 'Invalid credentials'})  # Render login form with error message
     else:
@@ -284,12 +287,18 @@ def coach(request):
         context.update({'all_coach_details':all_coach_details})
     return render(request,"achievemate/dashboard/coach.html",context)
 
-@login_required
+# @login_required
 def coach_details(request,pk):
     context={}
     coach_data=AiCoach.objects.filter(id=pk)[0]
     context.update({'coach_data':coach_data})
     return render(request,"achievemate/dashboard/coach_details.html",context)
+
+def simple_coach_details(request,pk):
+    context={}
+    coach_data=AiCoach.objects.filter(id=pk)[0]
+    context.update({'coach_data':coach_data})
+    return render(request,"achievemate/dashboard/simple_coach_details.html",context)
 
 @login_required
 def chat_page(request):
@@ -568,7 +577,7 @@ def progress_tracking(request):
         datasets.append(dataset)
 
     # Pass data to template
-    chart_data = {
+    chart_data = { 
         'labels': labels,
         'datasets': datasets
     }
@@ -656,86 +665,134 @@ def separate_tasks(text: str) -> list:
     return separated_text
 
 def paymentsuccess(request):
+    session_id=request.GET.get("session_id")
+    session_obj=stripe.checkout.Session.retrieve(session_id)
+    user=User.objects.get(id=session_obj.metadata.user_id)
+    active=1 if session_obj["status"]=="complete" else 0
+    print("user is--active is ",user,active)
+    session_details=stripe.checkout.Session.retrieve(session_id)
+    print("Sessison_details",session_details)
+    user_stripe_obj=None
+    if UserStripe.objects.filter(user=user).exists():
+        user_stripe_obj = UserStripe.objects.get(user=user)
+        user_stripe_obj.is_active = 1
+        user_stripe_obj.plan = session_obj['metadata']['plan']
+        user_stripe_obj.save()
     return render(request,"achievemate/success.html")
- 
+    
 def paymentfailure(request):
+    print("Request of success page-->",request.GET.get("session_id"))
+    session_id=request.GET.get("session_id")
+    session_obj=stripe.checkout.Session.retrieve(session_id)
+    user=User.objects.get(id=session_obj.metadata.user_id)
+    active=1 if session_obj["status"]=="complete" else 0
+    print("user is--active is ",user,active)
+    session_details=stripe.checkout.Session.retrieve(session_id)
+    print("Sessison_details",session_details)
+    Payment.objects.create(               
+                user = Users.objects.get(id=session_details["client_reference_id"]),
+                amount =session_details["amount_total"]/100,
+                payment_date = timezone.now(),
+                status ='Failed',
+            ) 
     return render(request,"achievemate/cancel.html")
     
-# views.py
 import stripe
+stripe.api_key = settings.STRIPE_SECRET_KEY
+from django.contrib.sites.shortcuts import get_current_site
+
+# views.py
 def create_stripe_session(request):
     if request.method == 'POST':
-        price_id = request.POST.get('price_id')  # Assuming you pass the price_id from the frontend
-        print("Price id----->",price_id)
-        print("Http Host",request.META['HTTP_HOST'])
-        chosen_subscription=Subscription.objects.filter(id=price_id)[0]
-        print(chosen_subscription)
-        stripe.api_key = settings.STRIPE_SECRET_KEY
-        print("api key",stripe.api_key )
-        try:
-            session = stripe.checkout.Session.create(
-                line_items=[{
-                    'price': chosen_subscription.stripe_price_id,
-                    'quantity': 1,
-                }],
-                mode='subscription',
-                # success_url='http://127.0.0.1:8000/paymentsuccess/',
-                # cancel_url='http://127.0.0.1:8000/paymentfailure/',
-                success_url='https://achievemate.ai/paymentsuccess/',
-                cancel_url='https://achievemate.ai/paymentfailure/',
+        user_stripe = UserStripe.objects.filter(user=request.user)   
+        if user_stripe:
+            user_stripe=user_stripe[0]
+            print("User Exists in stripe")
+        else:
+            print("User not exists in Stripe")
+            response=stripe.Customer.create(
+                name=request.user.username,
+                email=request.user.email,
+                metadata={"User_id":request.user.id}
             )
-            print(session)
-            return JsonResponse({'sessionurl': session.url})
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
+            # print("Stripe Customer create Response==>",response)
+            user_stripe=UserStripe.objects.create(
+                stripe_customer_id=response.id,
+                user=request.user
+                )
+            print("customer Created in database")
+        price_id = request.POST.get('price_id')  # Assuming you pass the price_id from the frontend
+        current_site = get_current_site(request)
+        domain_url = f"{current_site}/"
+        chosen_subscription=Subscription.objects.filter(id=price_id)[0]
+        # try:
+        session = stripe.checkout.Session.create(
+            line_items=[{
+                'price': chosen_subscription.stripe_price_id,
+                'quantity': 1,
+            }],
+            client_reference_id=request.user.id,
+            metadata={"user_id":request.user.id,"user_stripe":user_stripe.id},
+            mode='subscription',
+            customer=user_stripe.stripe_customer_id,
+            success_url=domain_url+'paymentsuccess?session_id={CHECKOUT_SESSION_ID}',
+            cancel_url=domain_url+'paymentfailure',
+            # success_url='https://achievemate.ai/paymentsuccess/',
+            # cancel_url='https://  achievemate.ai/paymentfailure/',  
+        )
+        # print(session)
+        return JsonResponse({'sessionurl': session.url})
+        # except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
+    
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+# This is your test secret API key.
+stripe.api_key = settings.STRIPE_SECRET_KEY
+# Replace this endpoint secret with your endpoint's unique secret
+# If you are testing with the CLI, find the secret by running 'stripe listen'
+# If you are using an endpoint defined with the API or dashboard, look in your webhook settings
+# at https://dashboard.stripe.com/webhooks
+endpoint_secret = 'whsec_1aaeb34af8759a5f7f300c19e9577326c30f977d7f492006954a6ecfdc708871'
 
-# import json
-# from django.http import JsonResponse
-# from django.views.decorators.csrf import csrf_exempt
-# import stripe
-
-# # This is your test secret API key.
-# stripe.api_key = settings.STRIPE_SECRET_KEY
-# # Replace this endpoint secret with your endpoint's unique secret
-# # If you are testing with the CLI, find the secret by running 'stripe listen'
-# # If you are using an endpoint defined with the API or dashboard, look in your webhook settings
-# # at https://dashboard.stripe.com/webhooks
-# endpoint_secret = 'whsec_...'
-
-# @csrf_exempt
-# def webhook(request):
-#     if request.method == 'POST':
-#         payload = request.body
-#         event = None
-
-#         try:
-#             event = stripe.Webhook.construct_event(
-#                 payload, request.META.get('HTTP_STRIPE_SIGNATURE'), endpoint_secret
-#             )
-#         except ValueError as e:
-#             # Invalid payload
-#             return JsonResponse({'error': str(e)}, status=400)
-#         except stripe.error.SignatureVerificationError as e:
-#             # Invalid signature
-#             return JsonResponse({'error': str(e)}, status=400)
-
-#         # Handle the event
-#         if event['type'] == 'payment_intent.succeeded':
-#             payment_intent = event['data']['object']  # contains a stripe.PaymentIntent
-#             print('Payment for {} succeeded'.format(payment_intent['amount']))
-#             # Then define and call a method to handle the successful payment intent.
-#             # handle_payment_intent_succeeded(payment_intent)
-#         elif event['type'] == 'payment_method.attached':
-#             payment_method = event['data']['object']  # contains a stripe.PaymentMethod
-#             # Then define and call a method to handle the successful attachment of a PaymentMethod.
-#             # handle_payment_method_attached(payment_method)
-#         else:
-#             # Unexpected event type
-#             print('Unhandled event type {}'.format(event['type']))
-
-#         return JsonResponse({'success': True})
-#     else:
-#         return JsonResponse({'error': 'Invalid request method'}, status=405)
+from django.utils import timezone
+@csrf_exempt
+def webhook(request):
+    if request.method == 'POST':
+        payload = request.body
+        event = None
+        try:
+            event = stripe.Webhook.construct_event(
+                payload, request.META.get('HTTP_STRIPE_SIGNATURE'), endpoint_secret
+            )
+        except ValueError as e:
+            # Invalid payload
+            return JsonResponse({'error': str(e)}, status=400)
+        except stripe.error.SignatureVerificationError as e:
+            # Invalid signature
+            return JsonResponse({'error': str(e)}, status=400)
+        # print("EVENT==",event)
+        # Handle the event
+        if event['type'] == 'payment_intent.canceled':
+            payment_intent = event['data']['object']
+        elif event['type'] == 'payment_intent.created':
+            payment_intent = event['data']['object']
+        elif event['type'] == 'payment_intent.partially_funded':
+            payment_intent = event['data']['object']
+        elif event['type'] == 'checkout.session.completed':
+            session = event['data']['object']
+            # user_id=event['data']['object']["metadata"]["user_id"]
+            # print("User_id is --->",user_id)
+        elif event['type'] == 'payment_intent.payment_failed':
+            payment_intent = event['data']['object']
+        elif event['type'] == 'payment_intent.succeeded':
+            payment_intent = event['data']['object']   
+        else:
+            print('Unhandled event type {}'.format(event['type']))
+        return JsonResponse({'success': True})
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
