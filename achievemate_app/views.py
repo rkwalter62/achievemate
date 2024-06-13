@@ -731,9 +731,9 @@ from django.contrib.sites.shortcuts import get_current_site
 # @login_required
 # views.py
 def create_stripe_session(request):
-    if not request.user.is_authenticated:
-        return JsonResponse({"success":"Not login","msg":"Please Login first"})
     if request.method == 'POST':
+        if not request.user.is_authenticated:
+            return JsonResponse({"success":False,"msg":"Please Login first"})
         current_site = get_current_site(request)
         domain_url = f"{current_site}/"
         current_user=User.objects.get(id=request.user.id)

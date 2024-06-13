@@ -94,15 +94,18 @@
                     data: formData,
                     success: function(data) {
                         console.log(data)
+                        /*
+                        if(data.sucess=="Not login")
+                        {
+                            console.log("Inside not")
+                            alert(data.msg)
+                            window.location.href = "{% url 'index' %}";
+                        }
+                            */
                         if (data.success)
                         {
                             // Redirect the user to the Stripe checkout page
                             window.location.href = `${data.sessionurl}`;
-                        }
-                        else if(data.sucess=="Not login")
-                        {
-                            alert(data.msg)
-                            window.location.href = '{% url "index" %}';
                         }
                         else
                         {
