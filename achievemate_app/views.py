@@ -231,11 +231,11 @@ def about_us(request):
  
 def our_coach(request):
     context={}
-    try:
-        user_subscription = UserStripe.objects.get(user=request.user).plan
-        print(user_subscription)
-    except UserStripe.DoesNotExist:
-        return []
+    # try:
+    #     user_subscription = UserStripe.objects.get(user=request.user).plan
+    #     print(user_subscription)
+    # except UserStripe.DoesNotExist:
+    #     pass
     # if user_subscription.subscription_package.package_name == 'Essential Plan':
     #     all_coach_details=AiCoach.objects.all()[:1]  # Access to 1 coach
     # if user_subscription.subscription_package.package_name == 'Achievement Accelerator':
