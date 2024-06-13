@@ -86,7 +86,6 @@
                 // Construct data object
                 var formData = {
                     'price_id': priceId,
-                    "plan":
                     'csrfmiddlewaretoken': csr
                 };
                 $.ajax({
@@ -95,8 +94,15 @@
                     data: formData,
                     success: function(data) {
                         console.log(data)
-                        // Redirect the user to the Stripe checkout page
-                        window.location.href = `${data.sessionurl}`;
+                        if (data.success)
+                        {
+                            // Redirect the user to the Stripe checkout page
+                            window.location.href = `${data.sessionurl}`;
+                        }
+                        else
+                        {
+                            alert(data.msg)
+                        }
                     },
                     error: function(xhr, textStatus, errorThrown) {
                         console.error('Error:', errorThrown);

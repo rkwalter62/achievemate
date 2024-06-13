@@ -34,6 +34,9 @@ urlpatterns = [
     path('paymentsuccess/', views.paymentsuccess, name='paymentsuccess'),
     path('paymentfailure/', views.paymentfailure, name='paymentfailure'),
     path('webhook/', views.webhook, name='webhook'),
+    path('get_history', views.get_stripe_transaction_history, name="get_transaction_history"),
+    path('delete-subscription', views.delete_subscription, name="delete_subscription"),
+    path('upgrade-subscription', views.upgrade_subscription, name="upgrade_subscription"),
     path('simple_coach_details/<int:pk>', views.simple_coach_details, name='simple_coach_details'),
 
 

@@ -231,6 +231,17 @@ def about_us(request):
  
 def our_coach(request):
     context={}
+    try:
+        user_subscription = UserStripe.objects.get(user=request.user).plan
+        print(user_subscription)
+    except UserStripe.DoesNotExist:
+        return []
+    # if user_subscription.subscription_package.package_name == 'Essential Plan':
+    #     all_coach_details=AiCoach.objects.all()[:1]  # Access to 1 coach
+    # if user_subscription.subscription_package.package_name == 'Achievement Accelerator':
+    #     all_coach_details=AiCoach.objects.all()[:2]  # Access to 1 coach
+    # if user_subscription.subscription_package.package_name == 'Professional (for Licensed coaches and Therapists)':
+    #     all_coach_details=AiCoach.objects.all()  # Access to 1 coach
     all_coach_details=AiCoach.objects.all()
     context.update({'all_coach_details':all_coach_details})
     return render(request,"achievemate/our_coach.html",context)
@@ -283,7 +294,18 @@ def coach(request):
         )
         context.update({'all_coach_details' : all_coach_details})
     else:
-        all_coach_details=AiCoach.objects.all()
+        try:
+            user_subscription = UserStripe.objects.get(user=request.user).plan
+            print(user_subscription)
+        except UserStripe.DoesNotExist:
+            return []
+        if user_subscription.subscription_package.package_name == 'Essential Plan':
+            all_coach_details=AiCoach.objects.all()[:1]  # Access to 1 coach
+        if user_subscription.subscription_package.package_name == 'Achievement Accelerator':
+            all_coach_details=AiCoach.objects.all()[:2]  # Access to 1 coach
+        if user_subscription.subscription_package.package_name == 'Professional (for Licensed coaches and Therapists)':
+            all_coach_details=AiCoach.objects.all()  # Access to 1 coach
+        # all_coach_details=AiCoach.objects.all()
         context.update({'all_coach_details':all_coach_details})
     return render(request,"achievemate/dashboard/coach.html",context)
 
@@ -676,7 +698,7 @@ def paymentsuccess(request):
     if UserStripe.objects.filter(user=user).exists():
         user_stripe_obj = UserStripe.objects.get(user=user)
         user_stripe_obj.is_active = 1
-        user_stripe_obj.plan = session_obj['metadata']['plan']
+        user_stripe_obj.plan = session_obj['metadata']['plan_id']
         user_stripe_obj.save()
     return render(request,"achievemate/success.html")
     
@@ -689,12 +711,18 @@ def paymentfailure(request):
     print("user is--active is ",user,active)
     session_details=stripe.checkout.Session.retrieve(session_id)
     print("Sessison_details",session_details)
-    Payment.objects.create(               
-                user = Users.objects.get(id=session_details["client_reference_id"]),
-                amount =session_details["amount_total"]/100,
-                payment_date = timezone.now(),
-                status ='Failed',
-            ) 
+    if UserStripe.objects.filter(user=user).exists():
+        user_stripe_obj = UserStripe.objects.get(user=user)
+        user_stripe_obj.is_active = 0
+        user_stripe_obj.plan = session_obj['metadata']['plan_id']
+        user_stripe_obj.save()
+    
+    # Payment.objects.create(               
+    #             user = Users.objects.get(id=session_details["client_reference_id"]),
+    #             amount =session_details["amount_total"]/100,
+    #             payment_date = timezone.now(),
+    #             status ='Failed',
+    #         ) 
     return render(request,"achievemate/cancel.html")
     
 import stripe
@@ -704,50 +732,107 @@ from django.contrib.sites.shortcuts import get_current_site
 # views.py
 def create_stripe_session(request):
     if request.method == 'POST':
-        user_stripe = UserStripe.objects.filter(user=request.user)   
+        current_site = get_current_site(request)
+        domain_url = f"{current_site}/"
+        current_user=User.objects.get(id=request.user.id)
+        user_stripe = UserStripe.objects.filter(user=current_user)   
+        print("Existsing user in stripe-->",user_stripe)
+        price_id = request.POST.get('price_id')  # Assuming you pass the price_id from the frontend
+        chosen_subscription=Subscription.objects.filter(id=price_id)[0]
         if user_stripe:
             user_stripe=user_stripe[0]
             print("User Exists in stripe")
+            return JsonResponse({"success":False,"msg":"Already Subscribed, You can upgrade your subscription"})
         else:
             print("User not exists in Stripe")
             response=stripe.Customer.create(
                 name=request.user.username,
                 email=request.user.email,
-                metadata={"User_id":request.user.id}
+                metadata={"User_id":request.user.id,"plan_id":chosen_subscription.id}
             )
             # print("Stripe Customer create Response==>",response)
             user_stripe=UserStripe.objects.create(
                 stripe_customer_id=response.id,
-                user=request.user
+                user=request.user,
+                plan=None,
+                is_active=0
                 )
             print("customer Created in database")
-        price_id = request.POST.get('price_id')  # Assuming you pass the price_id from the frontend
-        current_site = get_current_site(request)
-        domain_url = f"{current_site}/"
-        chosen_subscription=Subscription.objects.filter(id=price_id)[0]
-        # try:
-        session = stripe.checkout.Session.create(
-            line_items=[{
-                'price': chosen_subscription.stripe_price_id,
-                'quantity': 1,
-            }],
-            client_reference_id=request.user.id,
-            metadata={"user_id":request.user.id,"user_stripe":user_stripe.id},
-            mode='subscription',
-            customer=user_stripe.stripe_customer_id,
-            success_url=domain_url+'paymentsuccess?session_id={CHECKOUT_SESSION_ID}',
-            cancel_url=domain_url+'paymentfailure',
-            # success_url='https://achievemate.ai/paymentsuccess/',
-            # cancel_url='https://  achievemate.ai/paymentfailure/',  
-        )
-        # print(session)
-        return JsonResponse({'sessionurl': session.url})
-        # except Exception as e:
-        return JsonResponse({'error': str(e)}, status=400)
+            try:
+                session = stripe.checkout.Session.create(
+                    line_items=[{
+                        'price': chosen_subscription.stripe_price_id,
+                        'quantity': 1,
+                    }],
+                    client_reference_id=request.user.id,
+                    metadata={"user_id":request.user.id,"user_stripe":user_stripe.id,"plan_id":chosen_subscription.id},
+                    mode='subscription',
+                    customer=user_stripe.stripe_customer_id,
+                    success_url=domain_url+'paymentsuccess?session_id={CHECKOUT_SESSION_ID}',
+                    cancel_url=domain_url+'paymentfailure',
+                    # success_url='https://achievemate.ai/paymentsuccess/',
+                    # cancel_url='https://achievemate.ai/paymentfailure/',  
+                )
+            # print(session)
+                return JsonResponse({"success":True,'sessionurl': session.url})
+            except Exception as e:
+                return JsonResponse({'error': str(e)}, status=400)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
-    
+@csrf_exempt
+def get_stripe_transaction_history(request):
+    user_id = request.POST.get('id')
+    users = Users.objects.filter(pk=user_id)
+    if users.exists():
+        print("User_Exists")
+        subscription_record = UserStripe.objects.filter(user=users[0])
+        subscription_history = []
+        if subscription_record.exists():
+            customer = stripe.Customer.retrieve(subscription_record[0].stripe_customer_id)
+            subscription_history = stripe.Invoice.list(customer=customer)
+        context = {'subscription_history': subscription_history, 'subscription_record': list(subscription_record.values()), 'message': 'user_found'}
+    else:
+        context = {'subscription_history': None, 'subscription_record': None, 'message': 'user_not_found'}
+    return JsonResponse(context)
+
+@csrf_exempt
+def delete_subscription(request):
+    user = Users.objects.get(pk=request.POST.get('id'))
+    customer = UserStripe.objects.get(user=user)
+    stripe_subscriptions = stripe.Subscription.list(customer=customer.stripe_customer_id, price=request.POST.get('price_id'))
+    response = stripe.Subscription.cancel(stripe_subscriptions['data'][0]['id'])
+    if response['status'] == 'canceled':
+        customer.is_active = 0
+        customer.save()
+        context = {"message": "SUCCESS"}
+    else:
+        context = {"message": "ERROR"}
+    return JsonResponse(context)
+
+@csrf_exempt
+def upgrade_subscription(request):
+    try:
+        user = Users.objects.get(pk=request.POST.get('id'))
+        subscription_obj = UserStripe.objects.get(user = user)
+        subscriptions = stripe.Subscription.list(customer=f'{subscription_obj.stripe_customer_id}')
+        respponse = stripe.Subscription.modify(
+                                    f"{subscriptions['data'][0]['id']}",
+                                    items=[{"id": f"{subscriptions['data'][0]['items']['data'][0]['id']}", "price": f"{request.POST.get('price_id')}"}],
+                                    )
+        # if respponse['data']['items']['data'][0]['plan']['amount'] == 19900:
+        #     subscription_obj.plan = 'GOLD'
+        #     subscription_obj.save()
+        # else:
+        #     subscription_obj.plan = 'BRONZE'
+        #     subscription_obj.save()
+
+        context = {"message": "SUCCESS"}
+    except Exception as e:
+        print(e)
+        context = {"message": "ERROR"}
+    return JsonResponse(context)
+
 import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -757,8 +842,8 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 # If you are testing with the CLI, find the secret by running 'stripe listen'
 # If you are using an endpoint defined with the API or dashboard, look in your webhook settings
 # at https://dashboard.stripe.com/webhooks
-endpoint_secret = 'whsec_1aaeb34af8759a5f7f300c19e9577326c30f977d7f492006954a6ecfdc708871'
-
+# endpoint_secret = 'whsec_1aaeb34af8759a5f7f300c19e9577326c30f977d7f492006954a6ecfdc708871'
+endpoint_secret='we_1PRBldCaOQJF93hZG6r23GNh'
 from django.utils import timezone
 @csrf_exempt
 def webhook(request):

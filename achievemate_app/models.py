@@ -265,5 +265,16 @@ class Payment(BaseModel):
 class UserStripe(BaseModel):
     stripe_customer_id=models.CharField(max_length=255, blank=True, null=True)
     user=models.ForeignKey('Users', models.DO_NOTHING, blank=True, null=True)  
-    plan = models.CharField(max_length=50, blank=True, null=True)
+    plan = models.ForeignKey('Subscription', models.DO_NOTHING, blank=True, null=True)  
     is_active = models.IntegerField(blank=True, null=True)
+    
+class DailyChatSession(BaseModel):
+    user = models.ForeignKey(Users, on_delete=models.CASCADE,blank=True, null=True)
+    date = models.DateField(default=timezone.now,blank=True, null=True)
+    session_count = models.PositiveIntegerField(default=0,blank=True, null=True)
+
+    class Meta:
+        unique_together = ('user', 'date')
+
+    def __str__(self):
+        return f'{self.user.username} - {self.date} - {self.session_count} sessions'
