@@ -728,9 +728,11 @@ def paymentfailure(request):
 import stripe
 stripe.api_key = settings.STRIPE_SECRET_KEY
 from django.contrib.sites.shortcuts import get_current_site
-@login_required
+# @login_required
 # views.py
 def create_stripe_session(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({"success":"Not login","msg":"Please Login first"})
     if request.method == 'POST':
         current_site = get_current_site(request)
         domain_url = f"{current_site}/"

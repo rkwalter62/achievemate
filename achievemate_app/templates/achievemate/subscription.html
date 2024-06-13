@@ -99,6 +99,11 @@
                             // Redirect the user to the Stripe checkout page
                             window.location.href = `${data.sessionurl}`;
                         }
+                        else if(data.sucess=="Not login")
+                        {
+                            alert(data.msg)
+                            window.location.href = '{% url "index" %}';
+                        }
                         else
                         {
                             alert(data.msg)
