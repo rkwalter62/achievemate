@@ -829,10 +829,10 @@ def create_stripe_session(request):
                     metadata={"user_id":request.user.id,"user_stripe":user_stripe.id,"plan_id":chosen_subscription.id},
                     mode='subscription',
                     customer=user_stripe.stripe_customer_id,
-                    success_url=domain_url+'paymentsuccess?session_id={CHECKOUT_SESSION_ID}',
-                    cancel_url=domain_url+'paymentfailure',
-                    # success_url='https://achievemate.ai/paymentsuccess/',
-                    # cancel_url='https://achievemate.ai/paymentfailure/',  
+                    # success_url=domain_url+'paymentsuccess?session_id={CHECKOUT_SESSION_ID}',
+                    # cancel_url=domain_url+'paymentfailure',
+                    success_url='https://achievemate.ai/paymentsuccess/?session_id={CHECKOUT_SESSION_ID}',
+                    cancel_url='https://achievemate.ai/paymentfailure/',  
                 )
             # print(session)
                 return JsonResponse({"success":True,'sessionurl': session.url})
