@@ -87,6 +87,18 @@
                                     <span class="text nav-text">Profile </span>
                                 </a>
                             </li>
+                            <!-- Dashboard  -->
+                            {% if user.is_authenticated %}
+                            <li class="nav-link">
+                                <a href="{% url 'dashboard'%}">
+                                    <span class="nav-link-icon">
+                                        <img src="{% static 'assets/img/icon/svg/sidebar/profile.svg' %}"
+                                            alt="icon/svg/sidebar/profile">
+                                    </span>
+                                    <span class="text nav-text">Profile </span>
+                                </a>
+                            </li>
+                            {% endif %}
                         </ul>
                         <!-- Logout -->
                         <ul class="">

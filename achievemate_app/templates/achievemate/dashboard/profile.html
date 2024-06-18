@@ -1,6 +1,7 @@
 {% extends "achievemate/dashboard/dashboard_base.html" %}
 {% load static %}
 {% block content %}
+{% load custom_filters %}
     <!-- page-layout Start -->
     <section class="page-layout">
         <!-- mobile_view_header Start-->
@@ -168,6 +169,51 @@
                     </div>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="table-responsive">
+                        <div class="simple-table sticky-table">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Plan data</th>
+                                        <th>Amount</th>
+                                        <th>Start date</th>
+                                        <th>End date</th>
+                                        <th>Is Active</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Loop start  -->
+                                     {% for subscription in subscription_data %}
+                                     <tr>
+                                        <td>{{ subscription.Plan }}</td>
+                                        <td>${{ subscription.Amount }}</td>
+                                        <td>{{ subscription.Start_Date|format_datetime }}</td>
+                                        <td>{{ subscription.End_Date|format_datetime }}</td>
+                                        <td>
+                                            {% if subscription.Is_Active %}
+                                            <span style="color: green;">Active</span>
+                                            {% else %}
+                                            <span style="color: red;">Inactive</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    <!-- Loop End  -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-4 mt-2">
+                    <div class="col-12" center>
+                        <div class="d-flex gap-3 justify-content-xl-end justify-content-center">
+                            <button id="subscription_upgrade" onclick="upgrade_subscription()" class="btn btn-scolor">Upgrade Subscription</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <!-- main-content END -->
     </section>
@@ -199,6 +245,31 @@
         });
     </script> {% endcomment %}
 <script>
+
+    function upgrade_subscription()
+    {
+        if(confirm("Upgrade Subscription")) {
+            $.ajax({
+                url: "/upgrade-subscription",
+                data: data,
+                method: 'POST',
+                success: function(response) {
+                   if(response['message'] == "SUCCESS") {
+                        alert("Plan upgraded successfully!")
+                        window.location.reload();
+                    } else {
+                       alert("Plan upgradation failed! Please try again later")
+                   }
+                }, 
+                error: function(error){
+                    console.error(error)
+                }
+            })
+        } else {
+            return
+        }
+
+    }
     $(document).ready(function () {
         $('#save-profile-btn').click(function (e) {
             e.preventDefault();

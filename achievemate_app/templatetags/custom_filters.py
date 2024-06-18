@@ -31,3 +31,20 @@ def remaining_days(due_date):
 @register.filter(name='absolute_value')
 def absolute_value(value):
     return abs(value)
+
+@register.filter(name='format_datetime')
+def format_datetime(value):
+    # print(f"Original value: {value}")
+    if not value:
+        return ''
+    if isinstance(value, str):
+        try:
+            value = datetime.strptime(value, '%Y-%m-%d %H:%M:%S %Z')
+        except ValueError:
+            print(f"Returning unchanged value: {value}")
+            return value
+    if isinstance(value, datetime):
+        formatted_value = value.strftime('%Y-%m-%d %H:%M')
+        # print(f"Formatted value: {formatted_value}")
+        return formatted_value
+    return value

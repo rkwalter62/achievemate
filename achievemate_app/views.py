@@ -119,12 +119,45 @@ def activate_account(request, uidb64, token):
 
 
 from django.contrib.auth import authenticate, login
-
+from datetime import datetime  # Correct import
+def unix_to_utc_date(unix_timestamp: int) -> str:
+    utc_dt = datetime.fromtimestamp(unix_timestamp, tz=timezone.utc)
+    return utc_dt.strftime('%Y-%m-%d %H:%M:%S %Z')
 @login_required
 def profile(request):
     context={}
     user_profile_data=UserProfile.objects.get(user=request.user)
+    current_stripe_user=UserStripe.objects.get(user=request.user)
+    print("Current stripe customer",current_stripe_user)
+    customer = stripe.Customer.retrieve(current_stripe_user.stripe_customer_id)
+    print("Customer",customer)
+    subscription_history = stripe.Invoice.list(customer=customer)
+    print("History",subscription_history)
+    extracted_data = []
+    for invoice in subscription_history['data']:
+        print("Lines-->",invoice["lines"])
+        start_date = unix_to_utc_date(invoice["lines"]["data"][0]["period"]['start'])
+        end_date = unix_to_utc_date(invoice["lines"]["data"][0]["period"]['end'])
+        amount =invoice["lines"]["data"][0]["plan"]["amount"]/100
+        is_active = invoice["lines"]["data"][0]["plan"]["active"]
+        # Assuming plan data is in metadata or a similar field
+        plan_data = invoice["lines"]["data"][0]["description"]
+
+        extracted_data.append({
+            'Start_Date': start_date,
+            'End_Date': end_date,
+            'Plan': plan_data,
+            'Amount': amount,
+            'Is_Active': is_active
+        })
+
+    # Print the extracted data
+    for data in extracted_data:
+        # print(data)
+    # all_subscriptions=stripe.Invoice.list(current_stripe_user.stripe_customer_id)
+        print("all_subscriptions-->",data)
     context.update({'user_profile_data':user_profile_data})
+    context.update({'subscription_data':extracted_data})
     if request.method == 'POST':
         user_profile_data.firstname=request.POST.get('firstname')
         user_profile_data.lastname=request.POST.get('lastname')
@@ -822,12 +855,6 @@ def upgrade_subscription(request):
                                     f"{subscriptions['data'][0]['id']}",
                                     items=[{"id": f"{subscriptions['data'][0]['items']['data'][0]['id']}", "price": f"{request.POST.get('price_id')}"}],
                                     )
-        # if respponse['data']['items']['data'][0]['plan']['amount'] == 19900:
-        #     subscription_obj.plan = 'GOLD'
-        #     subscription_obj.save()
-        # else:
-        #     subscription_obj.plan = 'BRONZE'
-        #     subscription_obj.save()
 
         context = {"message": "SUCCESS"}
     except Exception as e:
