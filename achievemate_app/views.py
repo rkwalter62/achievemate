@@ -346,7 +346,7 @@ def coach(request):
         try:
             user_subscription = UserStripe.objects.get(user=request.user,is_active=True).plan
             print(user_subscription)
-        except UserStripe.DoesNotExist:
+        except:
             pass
         if user_subscription==None:
             all_coach_details=AiCoach.objects.all()[:1]
