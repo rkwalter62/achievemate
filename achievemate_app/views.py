@@ -127,37 +127,41 @@ def unix_to_utc_date(unix_timestamp: int) -> str:
 def profile(request):
     context={}
     user_profile_data=UserProfile.objects.get(user=request.user)
-    current_stripe_user=UserStripe.objects.get(user=request.user)
-    print("Current stripe customer",current_stripe_user)
-    customer = stripe.Customer.retrieve(current_stripe_user.stripe_customer_id)
-    print("Customer",customer)
-    subscription_history = stripe.Invoice.list(customer=customer)
-    print("History",subscription_history)
-    extracted_data = []
-    for invoice in subscription_history['data']:
-        print("Lines-->",invoice["lines"])
-        start_date = unix_to_utc_date(invoice["lines"]["data"][0]["period"]['start'])
-        end_date = unix_to_utc_date(invoice["lines"]["data"][0]["period"]['end'])
-        amount =invoice["lines"]["data"][0]["plan"]["amount"]/100
-        is_active = invoice["lines"]["data"][0]["plan"]["active"]
-        # Assuming plan data is in metadata or a similar field
-        plan_data = invoice["lines"]["data"][0]["description"]
+    try:
+        current_stripe_user=UserStripe.objects.get(user=request.user)
+        print("Current stripe customer",current_stripe_user)
+        customer = stripe.Customer.retrieve(current_stripe_user.stripe_customer_id)
+        print("Customer",customer)
+        subscription_history = stripe.Invoice.list(customer=customer)
+        print("History",subscription_history)
+        extracted_data = []
+        for invoice in subscription_history['data']:
+            print("Lines-->",invoice["lines"])
+            start_date = unix_to_utc_date(invoice["lines"]["data"][0]["period"]['start'])
+            end_date = unix_to_utc_date(invoice["lines"]["data"][0]["period"]['end'])
+            amount =invoice["lines"]["data"][0]["plan"]["amount"]/100
+            is_active = invoice["lines"]["data"][0]["plan"]["active"]
+            # Assuming plan data is in metadata or a similar field
+            plan_data = invoice["lines"]["data"][0]["description"]
 
-        extracted_data.append({
-            'Start_Date': start_date,
-            'End_Date': end_date,
-            'Plan': plan_data,
-            'Amount': amount,
-            'Is_Active': is_active
-        })
+            extracted_data.append({
+                'Start_Date': start_date,
+                'End_Date': end_date,
+                'Plan': plan_data,
+                'Amount': amount,
+                'Is_Active': is_active
+            })
 
-    # Print the extracted data
-    for data in extracted_data:
-        # print(data)
-    # all_subscriptions=stripe.Invoice.list(current_stripe_user.stripe_customer_id)
-        print("all_subscriptions-->",data)
-    context.update({'user_profile_data':user_profile_data})
+            # Print the extracted data
+            for data in extracted_data:
+                # print(data)
+            # all_subscriptions=stripe.Invoice.list(current_stripe_user.stripe_customer_id)
+                print("all_subscriptions-->",data)
+    except:
+        current_stripe_user=None
+        extracted_data=[]
     context.update({'subscription_data':extracted_data})
+    context.update({'user_profile_data':user_profile_data})
     if request.method == 'POST':
         user_profile_data.firstname=request.POST.get('firstname')
         user_profile_data.lastname=request.POST.get('lastname')
