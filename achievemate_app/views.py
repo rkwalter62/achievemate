@@ -37,9 +37,9 @@ def index(request):
     context={}
     all_coach_details=AiCoach.objects.all()
     context.update({'all_coach_details':all_coach_details})
-    print("Session details=> ",dict(request.session))
+    # print("Session details=> ",dict(request.session))
     auth_user_id = request.session.get('_auth_user_id')  # Fetch _auth_user_id from session details
-    print("_auth_user_id:", auth_user_id)
+    # print("_auth_user_id:", auth_user_id)
     return render(request,"achievemate/index.html",context)
 
 @login_required
@@ -128,28 +128,39 @@ def profile(request):
     context={}
     user_profile_data=UserProfile.objects.get(user=request.user)
     try:
+        context = {}
+        subscriptions = Subscription.objects.all()
+        packages = SubscriptionPackage.objects.filter(subscription__in=subscriptions).distinct()
+        features = SubscriptionFeatures.objects.filter(subscription_package__in=packages).distinct()
+
+        context.update({'subscriptions': subscriptions, 'packages': packages, 'features': features})
         current_stripe_user=UserStripe.objects.get(user=request.user)
-        print("Current stripe customer",current_stripe_user)
+        # print("Current stripe customer",current_stripe_user)
         customer = stripe.Customer.retrieve(current_stripe_user.stripe_customer_id)
-        print("Customer",customer)
+        # print("Customer",customer)
         subscription_history = stripe.Invoice.list(customer=customer)
         print("History",subscription_history)
         extracted_data = []
         for invoice in subscription_history['data']:
-            print("Lines-->",invoice["lines"])
+            # print("Lines-->",invoice["lines"])
             start_date = unix_to_utc_date(invoice["lines"]["data"][0]["period"]['start'])
             end_date = unix_to_utc_date(invoice["lines"]["data"][0]["period"]['end'])
             amount =invoice["lines"]["data"][0]["plan"]["amount"]/100
             is_active = invoice["lines"]["data"][0]["plan"]["active"]
+            plan_id = invoice["lines"]["data"][0]["plan"]["id"]
             # Assuming plan data is in metadata or a similar field
-            plan_data = invoice["lines"]["data"][0]["description"]
+            current_subscription=Subscription.objects.filter(stripe_price_id=invoice["lines"]["data"][0]["plan"]["id"])
+            # plan_data = invoice["lines"]["data"][0]["description"]
+            plan_data=current_subscription[0].subscription_package.package_name
 
             extracted_data.append({
                 'Start_Date': start_date,
                 'End_Date': end_date,
                 'Plan': plan_data,
                 'Amount': amount,
-                'Is_Active': is_active
+                'Is_Active': is_active,
+                'plan_id':plan_id,
+                'customer_id':customer["id"]
             })
 
             # Print the extracted data
@@ -333,7 +344,7 @@ def coach(request):
     else:
         user_subscription=None
         try:
-            user_subscription = UserStripe.objects.get(user=request.user).plan
+            user_subscription = UserStripe.objects.get(user=request.user,is_active=True).plan
             print(user_subscription)
         except UserStripe.DoesNotExist:
             pass
@@ -739,7 +750,7 @@ def paymentsuccess(request):
     if UserStripe.objects.filter(user=user).exists():
         user_stripe_obj = UserStripe.objects.get(user=user)
         user_stripe_obj.is_active = 1
-        user_stripe_obj.plan = session_obj['metadata']['plan_id']
+        user_stripe_obj.plan = Subscription.objects.filter(id=int(session_obj['metadata']['plan_id']))[0]
         user_stripe_obj.save()
     return render(request,"achievemate/success.html")
     
@@ -756,6 +767,7 @@ def paymentfailure(request):
         user_stripe_obj = UserStripe.objects.get(user=user)
         user_stripe_obj.is_active = 0
         user_stripe_obj.plan = session_obj['metadata']['plan_id']
+        user_stripe_obj.plan = Subscription.objects.filter(id=int(session_obj['metadata']['plan_id']))[0]
         user_stripe_obj.save()
     
     # Payment.objects.create(               
@@ -778,7 +790,7 @@ def create_stripe_session(request):
         current_site = get_current_site(request)
         domain_url = f"{current_site}/"
         current_user=User.objects.get(id=request.user.id)
-        user_stripe = UserStripe.objects.filter(user=current_user)   
+        user_stripe = UserStripe.objects.filter(user=current_user,is_active=True)   
         print("Existsing user in stripe-->",user_stripe)
         price_id = request.POST.get('price_id')  # Assuming you pass the price_id from the frontend
         chosen_subscription=Subscription.objects.filter(id=price_id)[0]
@@ -794,13 +806,19 @@ def create_stripe_session(request):
                 metadata={"User_id":request.user.id,"plan_id":chosen_subscription.id}
             )
             # print("Stripe Customer create Response==>",response)
-            user_stripe=UserStripe.objects.create(
-                stripe_customer_id=response.id,
-                user=request.user,
-                plan=None,
-                is_active=0
-                )
-            print("customer Created in database")
+            user_stripe=UserStripe.objects.filter(user=current_user,is_active=False)  
+            if not user_stripe:
+                user_stripe=UserStripe.objects.create(
+                    stripe_customer_id=response.id,
+                    user=request.user,
+                    plan=None,
+                    is_active=0
+                    )
+                print("customer Created in database")
+            else:
+                user_stripe=user_stripe[0]
+                user_stripe.is_active=True
+                user_stripe.save()
             try:
                 session = stripe.checkout.Session.create(
                     line_items=[{
@@ -841,13 +859,14 @@ def get_stripe_transaction_history(request):
 
 @csrf_exempt
 def delete_subscription(request):
-    user = Users.objects.get(pk=request.POST.get('id'))
-    customer = UserStripe.objects.get(user=user)
-    stripe_subscriptions = stripe.Subscription.list(customer=customer.stripe_customer_id, price=request.POST.get('price_id'))
-    response = stripe.Subscription.cancel(stripe_subscriptions['data'][0]['id'])
+    user = Users.objects.get(id=request.user.id)
+    subscription_obj = UserStripe.objects.get(user=user)
+    subscriptions = stripe.Subscription.list(customer=f'{subscription_obj.stripe_customer_id}')
+    print("delete subscriptions",subscriptions)
+    response = stripe.Subscription.cancel(subscriptions['data'][0]['id'])
     if response['status'] == 'canceled':
-        customer.is_active = 0
-        customer.save()
+        subscription_obj.is_active = 0
+        subscription_obj.save()
         context = {"message": "SUCCESS"}
     else:
         context = {"message": "ERROR"}
@@ -856,15 +875,20 @@ def delete_subscription(request):
 @csrf_exempt
 def upgrade_subscription(request):
     try:
-        user = Users.objects.get(pk=request.POST.get('id'))
+        user = Users.objects.get(id=request.user.id)
         subscription_obj = UserStripe.objects.get(user = user)
         subscriptions = stripe.Subscription.list(customer=f'{subscription_obj.stripe_customer_id}')
+        print("Subscription Inside upgrade-->",subscriptions)
+        new_subscription=Subscription.objects.get(id=request.POST["new_subscription_id"])
         respponse = stripe.Subscription.modify(
                                     f"{subscriptions['data'][0]['id']}",
-                                    items=[{"id": f"{subscriptions['data'][0]['items']['data'][0]['id']}", "price": f"{request.POST.get('price_id')}"}],
+                                    items=[{"id": f"{subscriptions['data'][0]['items']['data'][0]['id']}", "price": f"{new_subscription.stripe_price_id}"}],
+                                    proration_behavior='always_invoice',
                                     )
 
         context = {"message": "SUCCESS"}
+        subscription_obj.plan=Subscription.objects.get(stripe_price_id=new_subscription.stripe_price_id)
+        subscription_obj.save()
     except Exception as e:
         print(e)
         context = {"message": "ERROR"}

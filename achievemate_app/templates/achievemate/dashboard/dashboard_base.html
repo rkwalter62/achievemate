@@ -88,7 +88,7 @@
                                 </a>
                             </li>
                             <!-- Dashboard  -->
-                            {% if user.is_authenticated %}
+                            {% comment %} {% if user.is_authenticated %}
                             <li class="nav-link">
                                 <a href="{% url 'dashboard'%}">
                                     <span class="nav-link-icon">
@@ -98,7 +98,7 @@
                                     <span class="text nav-text">Dashboard </span>
                                 </a>
                             </li>
-                            {% endif %}
+                            {% endif %} {% endcomment %}
                         </ul>
                         <!-- Logout -->
                         <ul class="">

@@ -180,8 +180,10 @@
                                         <th>Amount</th>
                                         <th>Start date</th>
                                         <th>End date</th>
-                                        <th>Is Active</th>
-                                    </tr>
+                                        {% comment %} <th>Is Active</th> {% endcomment %}
+                                        <th>Upgrade</th>
+                                        <th>Cancel</th>
+                                        </tr>
                                 </thead>
                                 <tbody>
                                     <!-- Loop start  -->
@@ -191,13 +193,22 @@
                                         <td>${{ subscription.Amount }}</td>
                                         <td>{{ subscription.Start_Date|format_datetime }}</td>
                                         <td>{{ subscription.End_Date|format_datetime }}</td>
-                                        <td>
+                                        {% comment %} <td>
                                             {% if subscription.Is_Active %}
                                             <span style="color: green;">Active</span>
                                             {% else %}
                                             <span style="color: red;">Inactive</span>
                                             {% endif %}
+                                        </td> {% endcomment %}
+                                        <td>
+                                            {% if forloop.first %}
+                                            <button id="subscription_upgrade" data-plan-id="{{subscription.plan_id}}" data-customer-id="{{subscription.customer_id}}" class="btn btn-scolor">Upgrade Subscription</button>
+                                            {% endif %}
                                         </td>
+                                        <td>
+                                            {% if forloop.first %}
+                                            <button id="subscription_cancel" data-plan-id="{{subscription.plan_id}}" data-customer-id="{{subscription.customer_id}}" class="btn btn-outline">Cancel Subscription</button>
+                                            {% endif %}
                                     </tr>
                                     {% endfor %}
                                     <!-- Loop End  -->
@@ -206,18 +217,59 @@
                         </div>
                     </div>
                 </div>
-                <div class="row g-4 mt-2">
-                    <div class="col-12" center>
-                        <div class="d-flex gap-3 justify-content-xl-end justify-content-center">
-                            <button id="subscription_upgrade" onclick="upgrade_subscription()" class="btn btn-scolor">Upgrade Subscription</button>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
         <!-- main-content END -->
     </section>
     <!-- page-layout END -->
+
+    <!-- Assuming you are using Bootstrap for the modal -->
+<div class="modal fade" id="subscriptionModal" tabindex="-1" aria-labelledby="subscriptionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="subscriptionModalLabel">Select Subscription Plan</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Subscription plans -->
+          <div class="row row-cols-lg-3 row-cols-md-3 row-cols-sm-2 row-cols-1 g-3">
+            {% for package in packages %}
+              <div class="col">
+                <div class="subscription-wrap">
+                  <div class="subscription-content">
+                    <div class="subscription-header">
+                      <span class="subscription-plan">{{ package.package_name }}</span>
+                      
+                    </div>
+                    <div class="subscription-body">
+                      <div class="plan-list">
+                        <ul>
+                          {% for feature in features %}
+                            {% if feature.subscription_package == package %}
+                              <li><i class="ri-check-fill"></i>{{ feature.feature_name }}</li>
+                            {% endif %}
+                          {% endfor %}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                  {% for subscription in subscriptions %}
+                    {% if subscription.subscription_package == package %}
+                      <div class="subscription-footer">
+                        <button role="button" data-subscription-new-id="{{subscription.id}}" class="btn btn-mcolor w-100">${{ subscription.price }} for {{ subscription.duration }} months</button>
+                      </div>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
     {% endblock %}
     {% block script %}
     {% comment %} <script>
@@ -245,20 +297,24 @@
         });
     </script> {% endcomment %}
 <script>
-
-    function upgrade_subscription()
+    $('#subscription_cancel').click(function (e)
     {
-        if(confirm("Upgrade Subscription")) {
+        let data = {
+            'plan_id': $('#subscription_upgrade').attr('data-plan-id'),
+            'customer_id': $('#subscription_upgrade').attr('data-customer-id'),
+        };
+        e.preventDefault();
+        if(confirm("Cancel Subscription")) {
             $.ajax({
-                url: "/upgrade-subscription",
+                url: "/delete-subscription",
                 data: data,
                 method: 'POST',
                 success: function(response) {
                    if(response['message'] == "SUCCESS") {
-                        alert("Plan upgraded successfully!")
-                        window.location.reload();
+                       alert("Subscription canceled successfully");
+                       window.location.reload();
                     } else {
-                       alert("Plan upgradation failed! Please try again later")
+                       alert("Some error occured in Subscription cancellation on server");
                    }
                 }, 
                 error: function(error){
@@ -268,6 +324,53 @@
         } else {
             return
         }
+    });
+
+
+    $('#subscription_upgrade').click(function (e)
+    {
+        e.preventDefault();
+
+        let subscription_new_id=null;
+
+        $('#subscriptionModal').modal('show');
+
+        $('#subscriptionModal').on('click', '.btn-mcolor', function() {
+            subscription_new_id = $(this).data('subscription-new-id');
+            $('#subscriptionModal').modal('hide');
+            if (subscription_new_id) {
+                if (confirm("Upgrade Subscription?")) {
+                    let data = {
+                        'plan_id': $('#subscription_upgrade').attr('data-plan-id'),
+                        'customer_id': $('#subscription_upgrade').attr('data-customer-id'),
+                        'new_subscription_id': subscription_new_id
+                    };
+                    console.log(data)
+                    $.ajax({
+                        url: "/upgrade-subscription",
+                        data: data,
+                        method: 'POST',
+                        success: function(response) {
+                            if (response['message'] === "SUCCESS") {
+                                alert("Plan upgraded successfully!");
+                                {% comment %} window.location.reload(); {% endcomment %}
+                            } else {
+                                alert("Plan upgrade failed! Please try again later.");
+                            }
+                        },
+                        error: function(error) {
+                            console.error(error);
+                        }
+                    });
+                }
+            } else {
+                alert("Please select a subscription.");
+            }
+        });
+    });
+
+    function cancel_subscription()
+    {
 
     }
     $(document).ready(function () {
