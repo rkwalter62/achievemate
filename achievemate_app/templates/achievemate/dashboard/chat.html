@@ -240,9 +240,10 @@
             } else if (message.startsWith("Answer:")) {
                 return message.substring(7).trim();
             }
+            //console.log("inside remove answer prefix\n",message)
             return message;
         }
-        function extractQuestions(text) {
+        {% comment %} function extractQuestions(text) {
             // Find the index of "recommended questions"
             const index = text.toLowerCase().indexOf("recommended question");
         
@@ -252,7 +253,7 @@
             }
         
             // Get the substring after "recommended questions"
-            const questionsText = text.substring(index + "recommended question".length);
+            const questionsText = text.substring(index + "Recommended Question".length);
         
             // Split the remaining text into an array of questions
             const questionsArray = questionsText.split(/\<br>/);
@@ -262,8 +263,88 @@
         
             // Return the array of questions
             return filteredQuestionsArray;
+        } {% endcomment %}
+        function extractQuestions(text) {
+            //console.log(text.toLowerCase())
+            if (typeof text !== 'string') return { filteredText: text, questions: [] };
+        
+            // Find the index of "Recommended Questions" (case-insensitive)
+            //const recommendedIndex = text.toLowerCase().indexOf("recommended questions");
+            const keywords = ["recommended questions", "recommended question", "recommended questions:</strong>", "recommended questions:<br>"];
+
+            // Find the index of the first occurrence of any keyword (case-insensitive)
+            let recommendedIndex = -1;
+            for (const keyword of keywords) {
+                const index = text.toLowerCase().indexOf(keyword);
+                if (index !== -1) {
+                    recommendedIndex = index;
+                    break; // Stop searching once the first match is found
+                }
+            }
+            // If "Recommended Questions" is not found, return the original text and an empty array
+            if (recommendedIndex === -1) {
+                return { filteredText: text, questions: [] };
+            }
+        
+            // Extract the text after "Recommended Questions"
+            let questionsText = text.substring(recommendedIndex);
+        
+            // Find the end of the "Recommended Questions" section
+            const endRecommendedIndex = questionsText.toLowerCase().indexOf("<br><br>");
+        
+            if (endRecommendedIndex !== -1) {
+                questionsText = questionsText.substring(0, endRecommendedIndex);
+            }
+        
+            // Define a regex to match each question (looking for numbers or bullet points followed by question text)
+            const questionRegex = /\d+\.\s.*?(?=<br>|$)/gs;
+            const questionsArray = questionsText.match(questionRegex) || [];
+        
+            // Remove any empty questions and trim whitespace
+            const filteredQuestionsArray = questionsArray.map(q => q.trim()).filter(q => q);
+        
+            // Remove the "Recommended Questions" section from the original text
+            const filteredText = text.substring(0, recommendedIndex).trim();
+        
+            return { filteredText, questions: filteredQuestionsArray };
         }
-          
+        function extractTaskQuestion(text) {
+            if (typeof text !== 'string') return { filteredText: text, hasTaskQuestion: false, taskQuestion: '' };
+            
+            // Find the index of "Task-Oriented Question" (case-insensitive)
+            const taskIndex = text.toLowerCase().indexOf("task-oriented question");
+            
+            // If "Task-Oriented Question" is found
+            let taskQuestion = '';
+            let hasTaskQuestion = false;
+            if (taskIndex !== -1) {
+                // Extract the text after "Task-Oriented Question"
+                let taskText = text.substring(taskIndex);
+        
+                // Find the end of the "Task-Oriented Question" section
+                const endTaskIndex = taskText.toLowerCase().indexOf("<br><br>");
+        
+                if (endTaskIndex !== -1) {
+                    taskText = taskText.substring(0, endTaskIndex);
+                }
+        
+                // Extract the task question itself
+                const taskQuestionRegex = /task-oriented question\s*(.*?)\s*(?=<br>|$)/i;
+                const taskMatch = taskText.match(taskQuestionRegex);
+                if (taskMatch) {
+                    taskQuestion = taskMatch[1].trim();
+                    hasTaskQuestion = true;
+                }
+            }
+        
+            // Remove the "Task-Oriented Question" section from the original text
+            let filteredTextTask = text;
+            if (hasTaskQuestion) {
+                filteredTextTask = filteredTextTask.replace(/task-oriented question.*?(?=<br><br>|$)/i, '').trim();
+            }
+        
+            return { filteredTextTask, hasTaskQuestion, taskQuestion };
+        }                
         // Function to render questions inside a <ul> list
         function renderQuestions(questionsArray) {
             // Select the parent element where the <ul> list is located
@@ -313,7 +394,7 @@
                 chatSenderList.appendChild(questionListItem);
             });
         }
-        function processChatText(chatText) {
+        {% comment %} function processChatText(chatText) {
             // Check if the text contains "task oriented question"
             const isTask = chatText.toLowerCase().includes("task oriented question");
         
@@ -340,7 +421,7 @@
             chatText = chatText.replace(/\\\\n/g, "<br>").replace(/\\\\n\\\\n/g, "<br><br>").replace(/\\\*\\\*(.*?)\\\*\\\*/g, '<strong>$1</strong>').replace(/\\\\'/g, "'");
             
             return { chatMessage: chatText, isTask: isTask };
-        }
+        } {% endcomment %}
         
             function updateMessages() {
                 $.ajax({
@@ -359,15 +440,24 @@
                         
                         messages.forEach(function(chat) {
                             var messageHtml;
-                            console.log("chat: ",chat)
-                            var chatMessage = chat[0].replace(/\\n/g, "<br>").replace(/\\n\\n/g, "<br><br>").replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\\'/g, "'");
+                            //console.log("chat: ",chat)
+                            //console.log(chat[0])
+                            var chatMessage = chat[0].replace(/\\n/g, "<br>").replace(/\\n\\n/g, "<br><br>").replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\\'/g, "'").replace(/###/g, '');;
+                            //console.log("Chat mesage in foreach lopp\n",chatMessage)
                             chatMessage = removeAnswerPrefix(chatMessage);
-                            Questionsrecommended = extractQuestions(chatMessage);
-                            renderQuestions(Questionsrecommended);
-                            var chatTextResult = processChatText(chatMessage);
+                            //Questionsrecommended = extractQuestions(chatMessage);
+                            //console.log(chatMessage)
+                            const { filteredText, questions } = extractQuestions(chatMessage);
+                            console.log(questions)
+
+                            const { filteredTextTask, hasTaskQuestion, taskQuestion } = extractTaskQuestion(filteredText);
+                            //console.log(filteredTextTask,hasTaskQuestion,"\n\n\n",taskQuestion)
+                            console.log(hasTaskQuestion)
+                            renderQuestions(questions);
+                            //var chatTextResult = processChatText(chatMessage);
                             // Access chatMessage and isTask from the result object
-                            chatMessage = chatTextResult.chatMessage;
-                            var processedIsTask = chatTextResult.isTask;
+                            chatMessage = filteredTextTask;
+                            var processedIsTask = hasTaskQuestion
                             //console.log(processedIsTask,chatMessage)
                 if (chat[1] == "user") {
                     messageHtml = `
