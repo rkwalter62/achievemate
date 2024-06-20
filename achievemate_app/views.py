@@ -381,6 +381,12 @@ def chat_page(request):
     print("current_chatted coaches--->",coaches_data)
     context={}
     context.update({'coaches_data':coaches_data})
+    current_user=User.objects.get(id=request.user.id)
+    user_stripe=UserStripe.objects.filter(user=current_user,is_active=True)
+    if user_stripe:
+        context.update({'is_subscribed':True})
+    else:
+        context.update({'is_subscribed':False})
     return render(request,"achievemate/dashboard/chat.html",context)
 
 
@@ -392,6 +398,12 @@ def chat(request,uid,cid):
     coaches_data = AiCoach.objects.filter(id__in=coach_ids)
     context.update({'coaches_data':coaches_data})
     context.update({'uid':uid,'cid':cid})
+    current_user=User.objects.get(id=request.user.id)
+    user_stripe=UserStripe.objects.filter(user=current_user,is_active=True)
+    if user_stripe:
+        context.update({'is_subscribed':True})
+    else:
+        context.update({'is_subscribed':False})
     return render(request,"achievemate/dashboard/chat.html",context)
 
 from django.views.decorators.csrf import csrf_exempt
@@ -514,7 +526,7 @@ def dashboard(request):
     for one_id in all_coach_ids:
         all_tasks_coach = Tasks.objects.filter(coach_id=one_id)
         for task in all_tasks_coach:
-            if task.due_date < timezone.now() and task.task_status != 'Delayed':
+            if task.due_date < timezone.now() and task.task_status != 'Delayed' and task.task_status!= 'Done':
                 task.task_status = 'Delayed'
                 task.save()
                 # Create Activity_Log object

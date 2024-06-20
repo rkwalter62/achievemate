@@ -2,6 +2,14 @@
 {% load static %}
 {% block content %}
 {% load custom_filters %}
+<style>
+    .chatsend-btn a.disabled {
+        color: gray;
+        pointer-events: none;
+        cursor: not-allowed;
+    }
+    
+</style>
     <!-- page-layout Start -->
     <section class="page-layout">
         <!-- mobile_view_header Start-->
@@ -311,40 +319,51 @@
         function extractTaskQuestion(text) {
             if (typeof text !== 'string') return { filteredText: text, hasTaskQuestion: false, taskQuestion: '' };
             
-            // Find the index of "Task-Oriented Question" (case-insensitive)
-            const taskIndex = text.toLowerCase().indexOf("task-oriented question");
+            // Define keywords to identify task-oriented or recommended questions
+            const keywords = ["task-oriented question", "task oriented question", "task oriented question:</strong>", "task oriented question:<br>"];
+            let word = '';
             
-            // If "Task-Oriented Question" is found
+            // Find the index of any keyword in the text
+            let taskIndex = -1;
+            for (const keyword of keywords) {
+                const index = text.toLowerCase().indexOf(keyword);
+                if (index !== -1) {
+                    taskIndex = index;
+                    word = keyword;
+                    break; // Stop searching once the first match is found
+                }
+            }
+            
             let taskQuestion = '';
             let hasTaskQuestion = false;
             if (taskIndex !== -1) {
-                // Extract the text after "Task-Oriented Question"
+                // Extract the text after the found keyword
                 let taskText = text.substring(taskIndex);
-        
-                // Find the end of the "Task-Oriented Question" section
+                
+                // Find the end of the relevant section
                 const endTaskIndex = taskText.toLowerCase().indexOf("<br><br>");
-        
                 if (endTaskIndex !== -1) {
                     taskText = taskText.substring(0, endTaskIndex);
                 }
-        
-                // Extract the task question itself
-                const taskQuestionRegex = /task-oriented question\s*(.*?)\s*(?=<br>|$)/i;
+                
+                // Create a dynamic regular expression to match the task question based on the found keyword
+                const taskQuestionRegex = new RegExp(`${word}\\s*(.*?)\\s*(?=<br>|$)`, 'i');
                 const taskMatch = taskText.match(taskQuestionRegex);
                 if (taskMatch) {
                     taskQuestion = taskMatch[1].trim();
                     hasTaskQuestion = true;
                 }
             }
-        
-            // Remove the "Task-Oriented Question" section from the original text
+            
+            // Remove the relevant section from the original text
             let filteredTextTask = text;
             if (hasTaskQuestion) {
-                filteredTextTask = filteredTextTask.replace(/task-oriented question.*?(?=<br><br>|$)/i, '').trim();
+                const removeSectionRegex = new RegExp(`${word}.*?(?=<br><br>|$)`, 'i');
+                filteredTextTask = filteredTextTask.replace(removeSectionRegex, '').trim();
             }
         
             return { filteredTextTask, hasTaskQuestion, taskQuestion };
-        }                
+        }            
         // Function to render questions inside a <ul> list
         function renderQuestions(questionsArray) {
             // Select the parent element where the <ul> list is located
@@ -448,7 +467,7 @@
                             //Questionsrecommended = extractQuestions(chatMessage);
                             //console.log(chatMessage)
                             const { filteredText, questions } = extractQuestions(chatMessage);
-                            console.log(questions)
+                            //console.log(questions)
 
                             const { filteredTextTask, hasTaskQuestion, taskQuestion } = extractTaskQuestion(filteredText);
                             //console.log(filteredTextTask,hasTaskQuestion,"\n\n\n",taskQuestion)
@@ -664,5 +683,62 @@
         });
     };
 </script>
+{% comment %} <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const isSubscribed =false;  // Replace this with actual subscription status
+        const sendButton = document.getElementById('send-btn');
+        const clickCountKey = 'sendBtnClickCount';
+        const maxClicks = 1;
+        
+        // Initialize or retrieve the click count from localStorage
+        let clickCount = parseInt(localStorage.getItem(clickCountKey), 10);
+        if (isNaN(clickCount)) {
+            clickCount = 0;
+            localStorage.setItem(clickCountKey, clickCount);
+        }
+    
+        // Update the data-click-count attribute
+        sendButton.dataset.clickCount = clickCount;
+    
+        // Check if user is subscribed and handle click count
+        if (isSubscribed) {
+            sendButton.dataset.subscribed = 'true';
+    
+            if (clickCount >= maxClicks) {
+                sendButton.classList.add('disabled');
+                sendButton.style.pointerEvents = 'none';
+                console.log('Send button already disabled after 3 clicks');
+            }
+        } else {
+            sendButton.dataset.subscribed = 'false';
+        }
+    
+        sendButton.addEventListener('click', function () {
+            console.log("----")
+            const isSubscribed = sendButton.dataset.subscribed === 'true';
+            let clickCount = parseInt(sendButton.dataset.clickCount, 10);
+    
+            if (isSubscribed) {
+                if (clickCount < maxClicks) {
+                    
+                    clickCount += 1;
+                    sendButton.dataset.clickCount = clickCount;
+                    localStorage.setItem(clickCountKey, clickCount);
+                    console.log(`Button clicked ${clickCount} times`);
+    
+                    // Your send message logic here
+    
+                } else {
+                    sendButton.classList.add('disabled');
+                    sendButton.style.pointerEvents = 'none';
+                    console.log('Send button disabled after 3 clicks');
+                }
+            } else {
+                console.log('User is not subscribed');
+            }
+        });
+    });
+    </script>
+     {% endcomment %}
 
     {% endblock %}
