@@ -72,11 +72,13 @@ def signup(request):
         print(username,password)
         try:
             unverified_user = User.objects.get(email=email,is_verified=False)
+            unverified_user_profile=UserProfile.objects.get(user=unverified_user)
+            unverified_user_profile.delete()
             unverified_user.delete()
         except:
             pass
         try:
-            existing_user = User.objects.get(email=email)
+            existing_user = User.objects.get(Q(email=email) | Q(username=username))
             return JsonResponse({"error": "User with this email already exists."})
         except ObjectDoesNotExist:
             pass
@@ -139,7 +141,7 @@ def profile(request):
         customer = stripe.Customer.retrieve(current_stripe_user.stripe_customer_id)
         # print("Customer",customer)
         subscription_history = stripe.Invoice.list(customer=customer)
-        print("History",subscription_history)
+        # print("History",subscription_history)
         extracted_data = []
         for invoice in subscription_history['data']:
             # print("Lines-->",invoice["lines"])
@@ -165,9 +167,10 @@ def profile(request):
 
             # Print the extracted data
             for data in extracted_data:
+                pass
                 # print(data)
             # all_subscriptions=stripe.Invoice.list(current_stripe_user.stripe_customer_id)
-                print("all_subscriptions-->",data)
+                # print("all_subscriptions-->",data)
     except:
         current_stripe_user=None
         extracted_data=[]
@@ -524,7 +527,7 @@ def dashboard(request):
     all_coaches = AiCoach.objects.filter(id__in=all_coach_ids)
     all_tasks_collection = []
     for one_id in all_coach_ids:
-        all_tasks_coach = Tasks.objects.filter(coach_id=one_id)
+        all_tasks_coach = Tasks.objects.filter(coach_id=one_id,user_id=request.user)
         for task in all_tasks_coach:
             if task.due_date < timezone.now() and task.task_status != 'Delayed' and task.task_status!= 'Done':
                 task.task_status = 'Delayed'
@@ -803,7 +806,7 @@ def create_stripe_session(request):
         domain_url = f"{current_site}/"
         current_user=User.objects.get(id=request.user.id)
         user_stripe = UserStripe.objects.filter(user=current_user,is_active=True)   
-        print("Existsing user in stripe-->",user_stripe)
+        # print("Existsing user in stripe-->",user_stripe)
         price_id = request.POST.get('price_id')  # Assuming you pass the price_id from the frontend
         chosen_subscription=Subscription.objects.filter(id=price_id)[0]
         if user_stripe:
@@ -875,13 +878,17 @@ def delete_subscription(request):
     subscription_obj = UserStripe.objects.get(user=user)
     subscriptions = stripe.Subscription.list(customer=f'{subscription_obj.stripe_customer_id}')
     print("delete subscriptions",subscriptions)
-    response = stripe.Subscription.cancel(subscriptions['data'][0]['id'])
-    if response['status'] == 'canceled':
-        subscription_obj.is_active = 0
-        subscription_obj.save()
-        context = {"message": "SUCCESS"}
-    else:
-        context = {"message": "ERROR"}
+    try:
+        response = stripe.Subscription.cancel(subscriptions['data'][0]['id'])
+        print("Deleted Resposne\n",response)
+        if response['status'] == 'canceled':
+            subscription_obj.is_active = 0
+            subscription_obj.save()
+            context = {"message": "SUCCESS"}
+        else:
+            context = {"message": "ERROR"}
+    except:
+        context={"message":"FAILURE"}
     return JsonResponse(context)
 
 @csrf_exempt
@@ -890,7 +897,7 @@ def upgrade_subscription(request):
         user = Users.objects.get(id=request.user.id)
         subscription_obj = UserStripe.objects.get(user = user)
         subscriptions = stripe.Subscription.list(customer=f'{subscription_obj.stripe_customer_id}')
-        print("Subscription Inside upgrade-->",subscriptions)
+        # print("Subscription Inside upgrade-->",subscriptions)
         new_subscription=Subscription.objects.get(id=request.POST["new_subscription_id"])
         respponse = stripe.Subscription.modify(
                                     f"{subscriptions['data'][0]['id']}",

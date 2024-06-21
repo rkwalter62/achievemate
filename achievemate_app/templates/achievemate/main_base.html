@@ -667,11 +667,12 @@
             });
         });
 
-        $(document).on('keyup', function(event) {
+        $(document).on('keypress', function(event) {
+            //alert("keypreseed")
             if (event.which !== undefined) {
-                console.log("Key pressed: " + event.which);
+                //alert("Key pressed: " + event.which);
                 if (event.which === 13) {
-                    console.log("Enter key pressed");
+                    //alert("Enter key pressed");
                     var activeModal = $('.modal.show')[0].id;
                     if (activeModal === "UserLogin") {
                         $('#login_button').click();

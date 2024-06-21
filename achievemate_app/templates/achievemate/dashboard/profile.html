@@ -91,7 +91,7 @@
                                                 <div class="cstm-profile-upload">
                                                     <div class="upload-btn-wrapper">
                                                         <button class="btn btn-scolor">Upload New Photo </button>
-                                                        <input type="file" name="profilepic" id="profilepic">
+                                                        <input type="file" name="profilepic" id="profilepic" accept="image/*">
                                                     </div>
                                                 </div>
                                                 <!-- Delete btn  -->
@@ -314,7 +314,15 @@
                        alert("Subscription canceled successfully");
                        window.location.reload();
                     } else {
-                       alert("Some error occured in Subscription cancellation on server");
+                        if(response['message'] == "FAILURE") {
+                            alert("Subscription not cancelled , Please try again later.");
+                            window.location.reload();
+                         }
+                         else
+                         {
+                             alert("Some error occured in Subscription cancellation on server");
+                             window.location.reload();
+                         }
                    }
                 }, 
                 error: function(error){
@@ -353,7 +361,7 @@
                         success: function(response) {
                             if (response['message'] === "SUCCESS") {
                                 alert("Plan upgraded successfully!");
-                                {% comment %} window.location.reload(); {% endcomment %}
+                                window.location.reload();
                             } else {
                                 alert("Plan upgrade failed! Please try again later.");
                             }
