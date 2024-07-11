@@ -20,7 +20,7 @@ from django.http import JsonResponse
 from .models import *
 from django.contrib import messages
 
-
+from django.utils.safestring import mark_safe
 # Define the login_required decorator
 def login_required(function):
     """
@@ -36,6 +36,8 @@ def login_required(function):
 def index(request):
     context={}
     all_coach_details=AiCoach.objects.all()
+    for coach in all_coach_details:
+        coach.coach_about = mark_safe(coach.coach_about)
     context.update({'all_coach_details':all_coach_details})
     # print("Session details=> ",dict(request.session))
     auth_user_id = request.session.get('_auth_user_id')  # Fetch _auth_user_id from session details
@@ -294,6 +296,9 @@ def our_coach(request):
     # if user_subscription.subscription_package.package_name == 'Professional (for Licensed coaches and Therapists)':
     #     all_coach_details=AiCoach.objects.all()  # Access to 1 coach
     all_coach_details=AiCoach.objects.all()
+    for coach in all_coach_details:
+        coach.coach_about = mark_safe(coach.coach_about)
+
     context.update({'all_coach_details':all_coach_details})
     return render(request,"achievemate/our_coach.html",context)
  
@@ -360,6 +365,9 @@ def coach(request):
         elif user_subscription.subscription_package.package_name == 'Professional (for Licensed coaches and Therapists)':
             all_coach_details=AiCoach.objects.all()  # Access to 1 coach
         
+        # Mark the coach_about field as safe for each coach
+        for coach in all_coach_details:
+            coach.coach_about = mark_safe(coach.coach_about)
         # all_coach_details=AiCoach.objects.all()
         context.update({'all_coach_details':all_coach_details})
     return render(request,"achievemate/dashboard/coach.html",context)
@@ -368,12 +376,16 @@ def coach(request):
 def coach_details(request,pk):
     context={}
     coach_data=AiCoach.objects.filter(id=pk)[0]
+    # Mark the coach_about field as safe for each coach
+    coach_data.coach_about = mark_safe(coach_data.coach_about)
     context.update({'coach_data':coach_data})
     return render(request,"achievemate/dashboard/coach_details.html",context)
 
 def simple_coach_details(request,pk):
     context={}
     coach_data=AiCoach.objects.filter(id=pk)[0]
+    # Mark the coach_about field as safe for each coach
+    coach_data.coach_about = mark_safe(coach_data.coach_about)
     context.update({'coach_data':coach_data})
     return render(request,"achievemate/dashboard/simple_coach_details.html",context)
 
@@ -381,6 +393,9 @@ def simple_coach_details(request,pk):
 def chat_page(request):
     coach_ids = Chat.objects.filter(user=request.user).values('coach_id').annotate(total=Count('coach_id')).values_list('coach_id', flat=True)
     coaches_data = AiCoach.objects.filter(id__in=coach_ids)
+    # Mark the coach_about field as safe for each coach
+    for coach in coaches_data:
+        coach.coach_about = mark_safe(coach.coach_about)
     print("current_chatted coaches--->",coaches_data)
     context={}
     context.update({'coaches_data':coaches_data})
@@ -399,6 +414,9 @@ def chat(request,uid,cid):
     context={}
     coach_ids = Chat.objects.filter(user=request.user).values('coach_id').annotate(total=Count('coach_id')).values_list('coach_id', flat=True)
     coaches_data = AiCoach.objects.filter(id__in=coach_ids)
+    # Mark the coach_about field as safe for each coach
+    for coach in coaches_data:
+        coach.coach_about = mark_safe(coach.coach_about)
     context.update({'coaches_data':coaches_data})
     context.update({'uid':uid,'cid':cid})
     current_user=User.objects.get(id=request.user.id)
