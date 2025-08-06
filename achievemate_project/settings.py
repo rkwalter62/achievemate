@@ -100,15 +100,24 @@ WSGI_APPLICATION = "achievemate_project.wsgi.application"
 #     }
 # }
 #offline database
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': os.environ.get('DB_NAME'),
+#         'USER': os.environ.get('DB_USER'),
+#         'PASSWORD': os.environ.get('DB_PASS'),
+#         'HOST':os.environ.get('DB_HOST'),
+#         'PORT':'3306',
+#     }
+#   }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get('DB_NAME'),
-        'USER': os.environ.get('DB_USER'), 
-        'PASSWORD': os.environ.get('DB_PASS'),
-        'HOST':os.environ.get('DB_HOST'),
-        'PORT':'3306',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / "db.sqlite3",
     }
+
+
+
 }
 
 
@@ -218,14 +227,22 @@ ASGI_APPLICATION = 'achievemate_project.asgi.application'
 #         "BACKEND": "channels.layers.InMemoryChannelLayer"
 #     }
 # }
+# For real-time chat, we need Redis. If Redis is not available, chat will work but without real-time features
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
-        },
-    },
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
 }
+
+# Uncomment below if you have Redis installed and running:
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels_redis.core.RedisChannelLayer",
+#         "CONFIG": {
+#             "hosts": [("127.0.0.1", 6379)],
+#         },
+#     },
+# }
 # CHANNEL_LAYERS = {
 #     "default": {
 #         "BACKEND": "channels_redis.core.RedisChannelLayer",
@@ -237,3 +254,15 @@ CHANNEL_LAYERS = {
 
 STRIPE_PUBLIC_KEY=os.environ.get('STRIPE_PUBLIC_KEY')
 STRIPE_SECRET_KEY=os.environ.get('STRIPE_SECRET_KEY')
+
+# HeyGen API Configuration
+HEYGEN_API_KEY=os.environ.get('HEYGEN_API_KEY')
+HEYGEN_BASE_URL='https://api.heygen.com'
+
+# Text-to-Speech API Configuration (Optional)
+ELEVENLABS_API_KEY=os.environ.get('ELEVENLABS_API_KEY')
+OPENAI_API_KEY=os.environ.get('OPENAI_API_KEY')  
+GOOGLE_CLOUD_TTS_API_KEY=os.environ.get('GOOGLE_CLOUD_TTS_API_KEY')
+AZURE_TTS_SUBSCRIPTION_KEY=os.environ.get('AZURE_TTS_SUBSCRIPTION_KEY')
+AZURE_TTS_REGION=os.environ.get('AZURE_TTS_REGION', 'eastus')
+VOICERSS_API_KEY=os.environ.get('VOICERSS_API_KEY')

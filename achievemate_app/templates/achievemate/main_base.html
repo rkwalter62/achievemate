@@ -489,11 +489,13 @@
           // Attach a click event handler to the button with id "btn_google_login"
           $("#btn_google_login").on("click", function() {
               // Redirect to the Google login URL
-              window.location.href = "{% provider_login_url 'google'  action='reauthenticate' %}";
+              // Temporarily disabled for local testing
+              alert("Google login temporarily disabled for local testing");
           });
           $("#btn_google_login2").on("click", function() {
               // Redirect to the Google login URL
-              window.location.href = "{% provider_login_url 'google'  action='reauthenticate' %}";
+              // Temporarily disabled for local testing
+              alert("Google login temporarily disabled for local testing");
           });
       });
   

@@ -221,10 +221,10 @@
         const cid = "{{cid}}" ? "{{cid}}" : 0;
         {% comment %} console.log(uid,cid); {% endcomment %}
         const roomName = `room_${uid}_${cid}`;
-        //const socket = new WebSocket(`ws://localhost:8000/ws/chat/${roomName}/`);
+        // Use appropriate protocol based on current page protocol
+        const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
         const socket = new WebSocket(
-            //'ws://' +
-            'wss://' +
+            protocol +
             window.location.host +
             '/ws/chat/' +
             roomName +
@@ -235,12 +235,44 @@
         socket.onopen = function(event) {
             console.log('WebSocket connection established');
         };
+        
+        socket.onerror = function(event) {
+            console.error('WebSocket error:', event);
+        };
+        
+        socket.onclose = function(event) {
+            console.log('WebSocket connection closed:', event.code, event.reason);
+        };
 
         socket.onmessage = function(event) {
-            const message = JSON.parse(event.data).message;
-            //$('#messages').append(`<div>${message}</div>`);
-            updateMessages();
-            //scrollToBottom();
+            console.log('Received WebSocket message:', event.data);
+            try {
+                const data = JSON.parse(event.data);
+                console.log('Parsed message data:', data);
+                
+                if (data.status === 'thinking') {
+                    console.log('Coach is thinking...');
+                    showThinkingIndicator();
+                } else if (data.message) {
+                    console.log('Received coach response:', data.message);
+                    if (data.audio_url) {
+                        console.log('Received audio URL:', data.audio_url);
+                    } else if (data.use_browser_tts) {
+                        console.log('Using browser TTS with voice:', data.voice_type);
+                    }
+                    hideThinkingIndicator();
+                    displayCoachMessage(data.message, {
+                        audio_url: data.audio_url,
+                        use_browser_tts: data.use_browser_tts,
+                        tts_text: data.tts_text,
+                        voice_type: data.voice_type
+                    });
+                    // Try to update messages from server, but don't fail if it doesn't work
+                    updateMessages();
+                }
+            } catch (e) {
+                console.error('Error parsing WebSocket message:', e);
+            }
         };
         function removeAnswerPrefix(message) {
             if (message.startsWith("answer:")) {
@@ -250,6 +282,165 @@
             }
             //console.log("inside remove answer prefix\n",message)
             return message;
+        }
+
+        // Function to display coach message directly in chat
+        function displayCoachMessage(message, audioOptions = {}) {
+            const cleanMessage = removeAnswerPrefix(message);
+            const formattedMessage = cleanMessage
+                .replace(/\\n/g, "<br>")
+                .replace(/\\n\\n/g, "<br><br>")
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\\'/g, "'")
+                .replace(/###/g, '');
+
+            let audioHtml = '';
+            const uniqueId = 'audio_' + Date.now();
+            
+            // Handle audio playback
+            if (audioOptions.audio_url) {
+                // Server-generated audio file
+                audioHtml = `
+                    <div class="coach-audio-container" style="margin-bottom: 10px;">
+                        <audio controls autoplay style="max-width: 300px;">
+                            <source src="${audioOptions.audio_url}" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio>
+                    </div>
+                `;
+            } else if (audioOptions.use_browser_tts) {
+                // Browser Text-to-Speech fallback
+                audioHtml = `
+                    <div class="coach-tts-container" style="margin-bottom: 10px;">
+                        <button onclick="playBrowserTTS('${uniqueId}', '${audioOptions.voice_type || 'female'}')" 
+                                class="btn btn-sm btn-outline-primary">
+                            <i class="ri-volume-up-line"></i> Play Audio
+                        </button>
+                        <span id="${uniqueId}" style="display: none;">${audioOptions.tts_text || cleanMessage}</span>
+                    </div>
+                `;
+            }
+
+            const messageHtml = `
+                <div class="usertalk-inner reply-inner">
+                    <div class="chatuser-img">
+                        <img src="{% static 'assets/img/chat-user.svg' %}" class="img-responsive">
+                    </div>
+                    <div class="userleft-msg">
+                        ${audioHtml}
+                        <span>${formattedMessage}</span>
+                        <div class="msg-dt">
+                            <button class="btn-scolor"><i class="ri-add-line"></i>Add to task</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            $('#messages').append(messageHtml);
+            
+            // Scroll to bottom
+            var chatWindow = $('#messages');
+            chatWindow.scrollTop(chatWindow[0].scrollHeight);
+            
+            // Auto-play browser TTS if no server audio
+            if (audioOptions.use_browser_tts && !audioOptions.audio_url) {
+                // Small delay to ensure DOM is ready
+                setTimeout(() => {
+                    playBrowserTTS(uniqueId, audioOptions.voice_type || 'female');
+                }, 500);
+            }
+        }
+
+        // Function to play text using browser's built-in TTS
+        function playBrowserTTS(elementId, voiceType) {
+            if ('speechSynthesis' in window) {
+                const text = document.getElementById(elementId).textContent;
+                const utterance = new SpeechSynthesisUtterance(text);
+                
+                // Configure voice based on type
+                const voices = speechSynthesis.getVoices();
+                let selectedVoice = null;
+                
+                if (voiceType === 'male') {
+                    selectedVoice = voices.find(voice => 
+                        voice.name.toLowerCase().includes('male') || 
+                        voice.name.toLowerCase().includes('david') ||
+                        voice.name.toLowerCase().includes('mark')
+                    );
+                } else {
+                    selectedVoice = voices.find(voice => 
+                        voice.name.toLowerCase().includes('female') || 
+                        voice.name.toLowerCase().includes('zira') ||
+                        voice.name.toLowerCase().includes('samantha')
+                    );
+                }
+                
+                if (selectedVoice) {
+                    utterance.voice = selectedVoice;
+                }
+                
+                // Set speech parameters
+                utterance.rate = 0.9; // Slightly slower for clarity
+                utterance.pitch = 1.0;
+                utterance.volume = 0.8;
+                
+                // Play the speech
+                speechSynthesis.speak(utterance);
+                
+                console.log('Playing browser TTS with voice:', selectedVoice ? selectedVoice.name : 'default');
+            } else {
+                console.warn('Browser TTS not supported');
+            }
+        }
+
+        // Function to show thinking indicator
+        function showThinkingIndicator() {
+            const thinkingHtml = `
+                <div id="thinking-indicator" class="usertalk-inner reply-inner">
+                    <div class="chatuser-img">
+                        <img src="{% static 'assets/img/chat-user.svg' %}" class="img-responsive">
+                    </div>
+                    <div class="userleft-msg">
+                        <span>
+                            <div class="typing">
+                                <span class="circle"></span>
+                                <span class="circle"></span>
+                                <span class="circle"></span>
+                            </div>
+                        </span>
+                    </div>
+                </div>
+            `;
+            $('#messages').append(thinkingHtml);
+            
+            // Scroll to bottom
+            var chatWindow = $('#messages');
+            chatWindow.scrollTop(chatWindow[0].scrollHeight);
+        }
+
+        // Function to hide thinking indicator
+        function hideThinkingIndicator() {
+            $('#thinking-indicator').remove();
+        }
+
+        // Function to display user message
+        function displayUserMessage(message) {
+            const messageHtml = `
+                <div class="usertalk-inner">
+                    <div class="chatuser-img">
+                        <img src="{% static 'assets/img/user.png' %}" class="img-responsive">
+                    </div>
+                    <div class="userright-msg">
+                        <span>${message}</span>
+                    </div>
+                </div>
+            `;
+            
+            $('#messages').append(messageHtml);
+            
+            // Scroll to bottom
+            var chatWindow = $('#messages');
+            chatWindow.scrollTop(chatWindow[0].scrollHeight);
         }
         {% comment %} function extractQuestions(text) {
             // Find the index of "recommended questions"
@@ -446,6 +637,9 @@
                 $.ajax({
                     url: `{% url 'get_messages' %}?uid=${parseInt(uid)}&cid=${parseInt(cid)}`,
                     type: 'GET',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
                     success: function(data) {
                         console.log("update message data -> ",data)
                         if (data.None=== null)
@@ -515,6 +709,12 @@
                                 var chatWindow = $('#messages');
                                 chatWindow.scrollTop(chatWindow[0].scrollHeight);
                         }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error loading messages:', error);
+                        console.error('Status:', status);
+                        console.error('Response:', xhr.responseText);
+                        // Chat WebSocket is working, so this is just for message history
                     }
                 });
             };
@@ -567,11 +767,15 @@
                     data: formData,
                     //$('#messages').append(typingreplyIndicatorHTML),
                     success: function(response) {
+                        // Display user message immediately
+                        displayUserMessage(message);
+                        
+                        // Send to WebSocket
                         socket.send(JSON.stringify({'message': message}));
                         $('#message-input').val('');
+                        
+                        // Try to update from server (may fail with 404, but that's OK)
                         updateMessages();
-                        //scrollToBottom();
-                        //alert(response.status)
                     }
                 });
             }

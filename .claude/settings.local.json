@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./venv/Scripts/python.exe manage.py runserver 0.0.0.0:8080 --traceback)",
+      "Bash(./venv/Scripts/python.exe manage.py shell:*)",
+      "Bash(./venv/Scripts/python.exe test_chat.py:*)",
+      "Bash(rm:*)",
+      "Bash(curl:*)",
+      "Bash(venv/Scripts/python:*)",
+      "Bash(taskkill:*)"
+    ],
+    "deny": []
+  }
+}
