@@ -1,0 +1,21 @@
+image: ubuntu:22.04
+
+stages:
+  - deploy
+
+deploy:
+  stage: deploy
+  before_script:
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client git -y )'
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo -e "${SSH_PRIVATE_KEY}" > SSH_PRIVATE_KEY
+    - chmod 600 SSH_PRIVATE_KEY
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+
+  script:
+    - ls -lsha && echo "Update code and restart Service"
+    - ssh -i SSH_PRIVATE_KEY ${USERNAME}@${Server_IP} "pwd && cd /var/www/html/achievemate_api && sudo service nginx stop && sudo service achievemate_api stop && git pull && sudo service achievemate_api restart && sudo service nginx restart && echo 'nginx service' && systemctl is-active nginx && echo 'achievemate_api service' && systemctl is-active achievemate_api.service && exit"
+
+  only:
+    - main

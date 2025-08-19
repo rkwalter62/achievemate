@@ -4,3 +4,11 @@
 .DS_Store
 .env
 venv
+
+# API specific ignores
+api/__pycache__/
+api/*.pyc
+
+# Temporary files to exclude
+media/coach_audio/
+db.sqlite3
